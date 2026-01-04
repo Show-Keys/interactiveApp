@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Interactive App</string>
+    <string name="title_activity_main">Interactive App</string>
+    <string name="package_name">com.thahertech.interactiveapp</string>
+    <string name="custom_url_scheme">com.thahertech.interactiveapp</string>
+</resources>
