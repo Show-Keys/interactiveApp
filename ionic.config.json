@@ -1,0 +1,7 @@
+{
+  "name": "interactive-app",
+  "type": "react",
+  "integrations": {
+    "capacitor": {}
+  }
+}
