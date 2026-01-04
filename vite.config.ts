@@ -6,6 +6,7 @@
   export default defineConfig({
     plugins: [react()],
     resolve: {
+      preserveSymlinks: true,
       extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
       alias: {
         'vaul@1.1.2': 'vaul',
