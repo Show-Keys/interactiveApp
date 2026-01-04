@@ -1711,3 +1711,37 @@
     transform: rotate(360deg);
   }
 }
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: var(--twinkle-min, 0.2);
+    transform: scale(1);
+  }
+  50% {
+    opacity: var(--twinkle-max, 1);
+    transform: scale(var(--twinkle-scale, 1.2));
+  }
+}
+
+.twinkle {
+  animation: twinkle var(--twinkle-duration, 3s) ease-in-out infinite;
+  animation-delay: var(--twinkle-delay, 0s);
+  will-change: opacity, transform;
+}
+
+@keyframes drift {
+  0%, 100% {
+    opacity: var(--drift-min-opacity, 0.3);
+    transform: translate3d(0px, 0px, 0px);
+  }
+  50% {
+    opacity: var(--drift-max-opacity, 0.6);
+    transform: translate3d(var(--drift-x, 0px), var(--drift-y, -100px), 0px);
+  }
+}
+
+.cosmic-drift {
+  animation: drift var(--drift-duration, 18s) ease-in-out infinite;
+  animation-delay: var(--drift-delay, 0s);
+  will-change: opacity, transform;
+}

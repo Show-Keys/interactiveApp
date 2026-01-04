@@ -1,5 +1,7 @@
 import { motion } from 'motion/react';
 import { ReactNode } from 'react';
+import { useIsMobile } from './ui/use-mobile';
+import { useReducedMotionLike } from './ui/use-reduced-motion';
 
 interface UniquePlanetProps {
   nameAr: string;
@@ -28,6 +30,10 @@ export default function UniquePlanet({
   isSelected = false,
   children,
 }: UniquePlanetProps) {
+  const isMobile = useIsMobile();
+  const reduceMotion = useReducedMotionLike();
+  const liteMode = isMobile || reduceMotion;
+
   const x = Math.cos((angle * Math.PI) / 180) * orbitRadius;
   const y = Math.sin((angle * Math.PI) / 180) * orbitRadius;
 
@@ -40,13 +46,13 @@ export default function UniquePlanet({
             <motion.div
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] h-[90%] rounded-full border-2"
               style={{ borderColor: `${primaryColor}60` }}
-              animate={{ rotate: 360 }}
+              animate={liteMode ? undefined : { rotate: 360 }}
               transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
             />
             <motion.div
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] h-[70%] rounded-full border"
               style={{ borderColor: `${primaryColor}40` }}
-              animate={{ rotate: -360 }}
+              animate={liteMode ? undefined : { rotate: -360 }}
               transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
             />
             {/* Service dots */}
@@ -79,7 +85,7 @@ export default function UniquePlanet({
                   height: `${100 + i * 20}%`,
                   borderColor: `${primaryColor}${(6 - i) * 10}`,
                 }}
-                animate={{ scale: [1, 1.3, 1], opacity: [0.6, 0, 0.6] }}
+                animate={liteMode ? undefined : { scale: [1, 1.3, 1], opacity: [0.6, 0, 0.6] }}
                 transition={{ duration: 3, repeat: Infinity, delay: i * 0.5 }}
               />
             ))}
@@ -127,10 +133,14 @@ export default function UniquePlanet({
                   left: '50%',
                   top: '50%',
                 }}
-                animate={{
-                  x: Math.cos(((deg * Math.PI) / 180)) * (size * 0.6),
-                  y: Math.sin(((deg * Math.PI) / 180)) * (size * 0.6),
-                }}
+                animate={
+                  liteMode
+                    ? undefined
+                    : {
+                        x: Math.cos(((deg * Math.PI) / 180)) * (size * 0.6),
+                        y: Math.sin(((deg * Math.PI) / 180)) * (size * 0.6),
+                      }
+                }
                 transition={{ duration: 8, repeat: Infinity, ease: 'linear', delay: i * 2.67 }}
               />
             ))}
@@ -189,7 +199,7 @@ export default function UniquePlanet({
             {/* Futuristic hexagon pattern */}
             <motion.div
               className="absolute inset-0 rounded-full overflow-hidden opacity-50"
-              animate={{ rotate: 360 }}
+              animate={liteMode ? undefined : { rotate: 360 }}
               transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
             >
               {[0, 60, 120, 180, 240, 300].map((deg) => (

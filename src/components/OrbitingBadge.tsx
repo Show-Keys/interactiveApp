@@ -1,4 +1,6 @@
 import { motion } from 'motion/react';
+import { useIsMobile } from './ui/use-mobile';
+import { useReducedMotionLike } from './ui/use-reduced-motion';
 
 interface OrbitingBadgeProps {
   label: string;
@@ -17,6 +19,10 @@ export default function OrbitingBadge({
   size = 28,
   duration = 20,
 }: OrbitingBadgeProps) {
+  const isMobile = useIsMobile();
+  const reduceMotion = useReducedMotionLike();
+  const liteMode = isMobile || reduceMotion;
+
   return (
     <motion.div
       className="absolute left-1/2 top-1/2 pointer-events-none"
@@ -26,7 +32,7 @@ export default function OrbitingBadge({
         marginLeft: `-${orbitRadius}px`,
         marginTop: `-${orbitRadius}px`,
       }}
-      animate={{ rotate: 360 }}
+      animate={liteMode ? undefined : { rotate: 360 }}
       transition={{
         duration: duration,
         repeat: Infinity,
@@ -45,7 +51,7 @@ export default function OrbitingBadge({
           top: `${50 + 50 * Math.sin((angle * Math.PI) / 180)}%`,
           transform: 'translate(-50%, -50%)',
         }}
-        animate={{ rotate: -360 }}
+        animate={liteMode ? undefined : { rotate: -360 }}
         transition={{
           duration: duration,
           repeat: Infinity,
@@ -58,10 +64,14 @@ export default function OrbitingBadge({
           style={{
             background: `radial-gradient(circle, ${color}60, transparent)`,
           }}
-          animate={{
-            scale: [1, 1.4, 1],
-            opacity: [0.5, 0, 0.5],
-          }}
+          animate={
+            liteMode
+              ? undefined
+              : {
+                  scale: [1, 1.4, 1],
+                  opacity: [0.5, 0, 0.5],
+                }
+          }
           transition={{
             duration: 2,
             repeat: Infinity,
