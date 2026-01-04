@@ -60,10 +60,14 @@
       "scripts": {
                   "dev": "node ./node_modules/vite/bin/vite.js",
                   "build": "node ./node_modules/vite/bin/vite.js build",
-              "android:sync": "npm run build && npx cap sync android",
-              "android:open": "npx cap open android",
-                  "android:apk:debug": "npm run build && npx cap sync android && cd android && .\\gradlew.bat assembleDebug",
-                  "android:apk:release": "npm run build && npx cap sync android && cd android && .\\gradlew.bat assembleRelease",
-                  "android:aab:release": "npm run build && npx cap sync android && cd android && .\\gradlew.bat bundleRelease"
+                          "postinstall": "node ./scripts/appflow-fix-capacitor-cli-perms.mjs",
+                          "cap:sync:android": "node ./node_modules/@capacitor/cli/bin/capacitor sync android",
+                          "cap:sync:ios": "node ./node_modules/@capacitor/cli/bin/capacitor sync ios",
+                          "cap:open:android": "node ./node_modules/@capacitor/cli/bin/capacitor open android",
+                    "android:sync": "npm run build && npm run cap:sync:android",
+                    "android:open": "npm run cap:open:android",
+                          "android:apk:debug": "npm run build && npm run cap:sync:android && cd android && .\\gradlew.bat assembleDebug",
+                          "android:apk:release": "npm run build && npm run cap:sync:android && cd android && .\\gradlew.bat assembleRelease",
+                          "android:aab:release": "npm run build && npm run cap:sync:android && cd android && .\\gradlew.bat bundleRelease"
       }
 }

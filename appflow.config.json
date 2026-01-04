@@ -1,0 +1,11 @@
+{
+  "apps": [
+    {
+      "appId": "a26767dc",
+      "root": ".",
+      "androidPath": "android",
+      "dependencyInstallCommand": "npm ci --silent || npm install --silent; npm i -g npx @capacitor/cli@8.0.0 --silent",
+      "webBuildCommand": "npm run build"
+    }
+  ]
+}
