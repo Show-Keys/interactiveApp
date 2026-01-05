@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { motion } from 'motion/react';
+import { useEffect, useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
 import CinematicBackground from './components/CinematicBackground';
 import MinisterSun from './components/MinisterSun';
 import UniquePlanet from './components/UniquePlanet';
@@ -235,6 +235,7 @@ export default function App() {
   const [selectedPlanet, setSelectedPlanet] = useState<number | null>(null);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [zoomedPlanet, setZoomedPlanet] = useState<number | null>(null);
+  const [showWelcome, setShowWelcome] = useState(true);
 
   const prefersReducedMotion = usePrefersReducedMotion();
   const reducedMotionLike = useReducedMotionLike();
@@ -244,6 +245,12 @@ export default function App() {
 
   const shouldOrbit = !prefersReducedMotion && !isPanelOpen;
   const orbitDuration = reducedMotionLike ? 320 : 200;
+
+  useEffect(() => {
+    const timeoutMs = prefersReducedMotion ? 800 : 1800;
+    const t = window.setTimeout(() => setShowWelcome(false), timeoutMs);
+    return () => window.clearTimeout(t);
+  }, [prefersReducedMotion]);
 
   const handlePlanetClick = (index: number) => {
     setSelectedPlanet(index);
@@ -273,6 +280,34 @@ export default function App() {
       className="relative overflow-hidden"
       style={{ width: '1440px', height: '3830px', background: '#000000' }}
     >
+      <AnimatePresence>
+        {showWelcome && (
+          <motion.div
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setShowWelcome(false)}
+          >
+            <motion.div
+              dir="rtl"
+              className="text-center px-10 py-8 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl"
+              initial={{ y: 12, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 12, opacity: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <div className="text-white text-3xl font-light tracking-wide">
+                مرحبا بكم في البرنامج التفاعلي
+              </div>
+              <div className="text-white/60 text-sm mt-3 font-extralight tracking-widest">
+                TAP TO START
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Cinematic background */}
       <CinematicBackground />
 
@@ -327,8 +362,8 @@ export default function App() {
             borderWidth: '1px',
             boxShadow: '0 0 20px rgba(251, 191, 36, 0.1), inset 0 0 20px rgba(251, 191, 36, 0.05)',
           }}
-          animate={{ rotate: 360 }}
-          transition={{ duration: 200, repeat: Infinity, ease: 'linear' }}
+          animate={shouldOrbit ? { rotate: 360 } : undefined}
+          transition={{ duration: orbitDuration, repeat: Infinity, ease: 'linear' }}
         />
 
         {/* Central Sun - Minister's Office */}
@@ -337,12 +372,17 @@ export default function App() {
           isZoomed={zoomedPlanet === null && isPanelOpen}
         />
 
-        {/* Department planets: rotate the whole group for a cheap orbit animation */}
-        <motion.div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-          style={{ width: `${orbitRadius * 2}px`, height: `${orbitRadius * 2}px` }}
-          animate={shouldOrbit ? { rotate: 360 } : undefined}
-          transition={{ duration: orbitDuration, repeat: Infinity, ease: 'linear' }}
+        {/* Department planets: CSS orbit rotation + counter-rotation keeps labels upright */}
+        <div
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 orbit-rotate"
+          style={
+            {
+              width: `${orbitRadius * 2}px`,
+              height: `${orbitRadius * 2}px`,
+              '--orbit-duration': `${orbitDuration}s`,
+              '--orbit-play': shouldOrbit ? 'running' : 'paused',
+            } as React.CSSProperties
+          }
         >
           {departments.map((dept, index) => {
             const angle = index * angleStep;
@@ -374,7 +414,7 @@ export default function App() {
               </UniquePlanet>
             );
           })}
-        </motion.div>
+        </div>
       </motion.div>
 
       {/* Info panel */}

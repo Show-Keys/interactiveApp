@@ -1745,3 +1745,27 @@
   animation-delay: var(--drift-delay, 0s);
   will-change: opacity, transform;
 }
+
+@keyframes orbitRotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes orbitCounter {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+.orbit-rotate {
+  animation: orbitRotate var(--orbit-duration, 200s) linear infinite;
+  animation-play-state: var(--orbit-play, running);
+  will-change: transform;
+}
+
+.orbit-counter {
+  animation: orbitCounter var(--orbit-duration, 200s) linear infinite;
+  animation-play-state: var(--orbit-play, running);
+  will-change: transform;
+}
