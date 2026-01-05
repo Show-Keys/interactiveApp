@@ -119,23 +119,18 @@ export default function CinematicBackground() {
       {stars.map((star) => (
         <div
           key={star.id}
-          className={liteMode ? 'absolute rounded-full bg-white' : 'absolute rounded-full bg-white twinkle'}
+          className="absolute rounded-full bg-white twinkle"
           style={
             {
               left: `${star.x}%`,
               top: `${star.y}%`,
               width: `${star.size}px`,
               height: `${star.size}px`,
-              opacity: star.opacity,
-              ...(liteMode
-                ? {}
-                : {
-                    '--twinkle-duration': `${star.duration}s`,
-                    '--twinkle-delay': `${star.delay}s`,
-                    '--twinkle-min': String(star.opacity * 0.3),
-                    '--twinkle-max': String(star.opacity),
-                    '--twinkle-scale': '1',
-                  }),
+              '--twinkle-duration': `${liteMode ? star.duration + 2 : star.duration}s`,
+              '--twinkle-delay': `${star.delay}s`,
+              '--twinkle-min': String(liteMode ? star.opacity * 0.65 : star.opacity * 0.3),
+              '--twinkle-max': String(star.opacity),
+              '--twinkle-scale': String(liteMode ? 1 : 1.05),
             } as CSSProperties
           }
         />
