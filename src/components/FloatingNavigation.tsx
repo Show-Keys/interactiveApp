@@ -21,24 +21,15 @@ export default function FloatingNavigation({ departments, selectedIndex, onSelec
       transition={{ duration: 0.8, delay: 0.5 }}
     >
       <div
-        className="px-8 py-4 rounded-2xl backdrop-blur-xl"
-        style={{
-          background: 'linear-gradient(135deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.7))',
-          border: '1px solid rgba(255, 255, 255, 0.1)',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
-        }}
+        className="px-8 py-4 rounded-2xl backdrop-blur-xl bg-gradient-to-br from-slate-950/80 to-slate-900/70 border border-white/10 shadow-2xl"
       >
         <div className="flex items-center gap-6">
           {/* Logo/Title */}
           <div
-            className="text-white/80 border-l pl-6"
-            style={{
-              direction: 'rtl',
-              fontFamily: 'system-ui, -apple-system, sans-serif',
-              borderColor: 'rgba(255, 255, 255, 0.2)',
-            }}
+            dir="rtl"
+            className="text-white/80 border-l border-white/20 pl-6"
           >
-            <div className="text-sm tracking-wide" style={{ fontWeight: 200 }}>
+            <div className="text-sm tracking-wide font-light">
               الوزارة
             </div>
           </div>
@@ -47,20 +38,17 @@ export default function FloatingNavigation({ departments, selectedIndex, onSelec
           <div className="flex items-center gap-3 max-w-[900px] overflow-x-auto scrollbar-hide">
             {/* Minister's Office */}
             <motion.button
-              className="px-4 py-2 rounded-lg whitespace-nowrap transition-all"
+              dir="rtl"
+              className="px-4 py-2 rounded-lg whitespace-nowrap transition-colors border text-white text-xs font-light"
               style={{
-                background: selectedIndex === -1 ? 'rgba(251, 191, 36, 0.2)' : 'transparent',
-                border: selectedIndex === -1 ? '1px solid rgba(251, 191, 36, 0.5)' : '1px solid rgba(255, 255, 255, 0.1)',
-                fontFamily: 'system-ui, -apple-system, sans-serif',
-                direction: 'rtl',
+                background: selectedIndex === -1 ? 'rgba(251, 191, 36, 0.18)' : 'rgba(255, 255, 255, 0.02)',
+                borderColor: selectedIndex === -1 ? 'rgba(251, 191, 36, 0.45)' : 'rgba(255, 255, 255, 0.12)',
               }}
-              whileHover={{ scale: 1.05, background: 'rgba(251, 191, 36, 0.15)' }}
+              whileHover={{ scale: 1.05, background: 'rgba(251, 191, 36, 0.12)' }}
               whileTap={{ scale: 0.95 }}
               onClick={() => onSelect(-1)}
             >
-              <div className="text-white text-xs" style={{ fontWeight: 300 }}>
-                مكتب الوزير
-              </div>
+              مكتب الوزير
             </motion.button>
 
             <div className="w-px h-4 bg-white/20" />
@@ -69,12 +57,11 @@ export default function FloatingNavigation({ departments, selectedIndex, onSelec
             {departments.map((dept, index) => (
               <motion.button
                 key={index}
-                className="px-3 py-2 rounded-lg whitespace-nowrap transition-all relative group"
+                dir="rtl"
+                className="px-3 py-2 rounded-lg whitespace-nowrap transition-colors relative group border text-xs font-light text-white/90"
                 style={{
-                  background: selectedIndex === index ? `${dept.color}30` : 'transparent',
-                  border: selectedIndex === index ? `1px solid ${dept.color}80` : '1px solid rgba(255, 255, 255, 0.05)',
-                  fontFamily: 'system-ui, -apple-system, sans-serif',
-                  direction: 'rtl',
+                  background: selectedIndex === index ? `${dept.color}26` : 'rgba(255, 255, 255, 0.02)',
+                  borderColor: selectedIndex === index ? `${dept.color}88` : 'rgba(255, 255, 255, 0.08)',
                 }}
                 whileHover={{ scale: 1.05, background: `${dept.color}20` }}
                 whileTap={{ scale: 0.95 }}
@@ -84,14 +71,12 @@ export default function FloatingNavigation({ departments, selectedIndex, onSelec
                 {selectedIndex === index && (
                   <motion.div
                     className="absolute bottom-0 left-1/2 -translate-x-1/2 h-0.5 w-3/4 rounded-full"
-                    style={{ background: dept.color, boxShadow: `0 0 8px ${dept.color}` }}
+                    style={{ background: dept.color }}
                     layoutId="activeNav"
                   />
                 )}
                 
-                <div className="text-white/90 text-xs" style={{ fontWeight: 300 }}>
-                  {dept.nameAr.replace(/^دائرة |^مكتب |^قسم /, '')}
-                </div>
+                {dept.nameAr.replace(/^دائرة |^مكتب |^قسم /, '')}
               </motion.button>
             ))}
           </div>

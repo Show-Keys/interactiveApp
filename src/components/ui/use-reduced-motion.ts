@@ -1,5 +1,25 @@
 import * as React from "react";
 
+export function usePrefersReducedMotion() {
+  const [prefers, setPrefers] = React.useState(false);
+
+  React.useEffect(() => {
+    const mql = window.matchMedia?.("(prefers-reduced-motion: reduce)");
+    const compute = () => setPrefers(Boolean(mql?.matches));
+
+    compute();
+
+    if (mql?.addEventListener) {
+      mql.addEventListener("change", compute);
+      return () => mql.removeEventListener("change", compute);
+    }
+
+    return;
+  }, []);
+
+  return prefers;
+}
+
 function getDeviceMemory(): number | undefined {
   const anyNavigator = navigator as unknown as { deviceMemory?: number };
   return anyNavigator.deviceMemory;

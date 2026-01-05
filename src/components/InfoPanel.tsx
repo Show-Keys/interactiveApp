@@ -37,11 +37,9 @@ export default function InfoPanel({
 
           {/* Side panel */}
           <motion.div
-            className="fixed right-0 top-0 bottom-0 w-[500px] z-50 overflow-hidden"
+            className="fixed right-0 top-0 bottom-0 w-[500px] z-50 overflow-hidden bg-gradient-to-l from-slate-950/95 to-slate-900/90 border-l-2 shadow-2xl"
             style={{
-              background: 'linear-gradient(to left, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.95))',
-              borderLeft: `2px solid ${color}80`,
-              boxShadow: `-20px 0 60px rgba(0, 0, 0, 0.5), inset 0 0 100px ${color}10`,
+              borderLeftColor: `${color}80`,
             }}
             initial={{ x: 500 }}
             animate={{ x: 0 }}
@@ -68,26 +66,21 @@ export default function InfoPanel({
                 </button>
 
                 <motion.div
-                  style={{
-                    direction: 'rtl',
-                    fontFamily: 'system-ui, -apple-system, sans-serif',
-                  }}
+                  dir="rtl"
                   initial={{ opacity: 0, y: -20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.2 }}
                 >
                   <div
-                    className="text-white text-3xl mb-2"
+                    className="text-white text-3xl mb-2 font-light"
                     style={{
-                      fontWeight: 300,
                       textShadow: `0 0 20px ${color}`,
                     }}
                   >
                     {nameAr}
                   </div>
                   <div
-                    className="text-white/60 text-sm tracking-widest uppercase"
-                    style={{ fontWeight: 200 }}
+                    className="text-white/60 text-sm tracking-widest uppercase font-extralight"
                   >
                     {nameEn}
                   </div>
@@ -113,15 +106,12 @@ export default function InfoPanel({
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.3 }}
-                  style={{
-                    direction: 'rtl',
-                    fontFamily: 'system-ui, -apple-system, sans-serif',
-                  }}
+                  dir="rtl"
                 >
-                  <div className="text-white/70 text-sm mb-3 tracking-wide" style={{ fontWeight: 300 }}>
+                  <div className="text-white/70 text-sm mb-3 tracking-wide font-light">
                     الغرض
                   </div>
-                  <div className="text-white/90 leading-relaxed" style={{ fontWeight: 300, fontSize: '15px' }}>
+                  <div className="text-white/90 leading-relaxed text-[15px] font-light">
                     {purpose}
                   </div>
                 </motion.div>
@@ -132,19 +122,16 @@ export default function InfoPanel({
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.4 }}
-                    style={{
-                      direction: 'rtl',
-                      fontFamily: 'system-ui, -apple-system, sans-serif',
-                    }}
+                    dir="rtl"
                   >
-                    <div className="text-white/70 text-sm mb-4 tracking-wide" style={{ fontWeight: 300 }}>
+                    <div className="text-white/70 text-sm mb-4 tracking-wide font-light">
                       الأقسام الفرعية
                     </div>
                     <div className="space-y-2">
                       {subDepartments.map((sub, index) => (
                         <motion.div
                           key={index}
-                          className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border"
+                          className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10"
                           style={{ borderColor: `${color}20` }}
                           initial={{ opacity: 0, x: 20 }}
                           animate={{ opacity: 1, x: 0 }}
@@ -154,10 +141,9 @@ export default function InfoPanel({
                             className="w-2 h-2 rounded-full flex-shrink-0"
                             style={{
                               background: color,
-                              boxShadow: `0 0 8px ${color}`,
                             }}
                           />
-                          <div className="text-white/80 text-sm" style={{ fontWeight: 300 }}>
+                          <div className="text-white/80 text-sm font-light">
                             {sub}
                           </div>
                         </motion.div>
@@ -171,19 +157,16 @@ export default function InfoPanel({
                   initial={{ opacity: 0, x: 20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.5 }}
-                  style={{
-                    direction: 'rtl',
-                    fontFamily: 'system-ui, -apple-system, sans-serif',
-                  }}
+                  dir="rtl"
                 >
-                  <div className="text-white/70 text-sm mb-4 tracking-wide" style={{ fontWeight: 300 }}>
+                  <div className="text-white/70 text-sm mb-4 tracking-wide font-light">
                     المسؤوليات الرئيسية
                   </div>
                   <div className="space-y-3">
                     {responsibilities.map((resp, index) => (
                       <motion.div
                         key={index}
-                        className="flex items-start gap-4 p-4 rounded-lg border"
+                        className="flex items-start gap-4 p-4 rounded-lg border border-white/10"
                         style={{
                           background: `linear-gradient(135deg, ${color}08, transparent)`,
                           borderColor: `${color}25`,
@@ -201,7 +184,7 @@ export default function InfoPanel({
                         >
                           <span className="text-white text-xs">{index + 1}</span>
                         </div>
-                        <div className="text-white/85 flex-1" style={{ fontWeight: 300, fontSize: '14px', lineHeight: '1.6' }}>
+                        <div className="text-white/85 flex-1 font-light text-sm leading-relaxed">
                           {resp}
                         </div>
                       </motion.div>

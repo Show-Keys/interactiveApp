@@ -6,6 +6,7 @@ import UniquePlanet from './components/UniquePlanet';
 import OrbitingBadge from './components/OrbitingBadge';
 import FloatingNavigation from './components/FloatingNavigation';
 import InfoPanel from './components/InfoPanel';
+import { usePrefersReducedMotion, useReducedMotionLike } from './components/ui/use-reduced-motion';
 import ministryLogo from 'figma:asset/e9f3f4cb580b0827ed78bb6ecbe12efcb70b7930.png';
 
 interface DepartmentData {
@@ -235,8 +236,14 @@ export default function App() {
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [zoomedPlanet, setZoomedPlanet] = useState<number | null>(null);
 
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const reducedMotionLike = useReducedMotionLike();
+
   const orbitRadius = 600;
   const angleStep = 360 / departments.length;
+
+  const shouldOrbit = !prefersReducedMotion && !isPanelOpen;
+  const orbitDuration = reducedMotionLike ? 320 : 200;
 
   const handlePlanetClick = (index: number) => {
     setSelectedPlanet(index);
@@ -295,7 +302,8 @@ export default function App() {
 
       {/* Solar system container */}
       <motion.div
-        className="absolute left-1/2 top-[700px] -translate-x-1/2"
+        className="absolute left-1/2 top-[820px] -translate-x-1/2 relative"
+        style={{ width: `${orbitRadius * 2}px`, height: `${orbitRadius * 2}px` }}
         animate={
           zoomedPlanet !== null
             ? {
@@ -329,38 +337,44 @@ export default function App() {
           isZoomed={zoomedPlanet === null && isPanelOpen}
         />
 
-        {/* Department planets */}
-        {departments.map((dept, index) => {
-          const angle = index * angleStep;
-          return (
-            <UniquePlanet
-              key={index}
-              nameAr={dept.nameAr}
-              nameEn={dept.nameEn}
-              angle={angle}
-              orbitRadius={orbitRadius}
-              primaryColor={dept.color}
-              secondaryColor={dept.secondaryColor}
-              size={dept.size}
-              planetType={dept.planetType}
-              onClick={() => handlePlanetClick(index)}
-              isSelected={selectedPlanet === index}
-            >
-              {/* Orbiting badges for sub-departments */}
-              {dept.subDepartments.map((sub, subIndex) => (
-                <OrbitingBadge
-                  key={subIndex}
-                  label={sub}
-                  angle={(360 / dept.subDepartments.length) * subIndex}
-                  orbitRadius={dept.size / 2 + 35}
-                  color={dept.color}
-                  size={24}
-                  duration={15 + subIndex * 2}
-                />
-              ))}
-            </UniquePlanet>
-          );
-        })}
+        {/* Department planets: rotate the whole group for a cheap orbit animation */}
+        <motion.div
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          style={{ width: `${orbitRadius * 2}px`, height: `${orbitRadius * 2}px` }}
+          animate={shouldOrbit ? { rotate: 360 } : undefined}
+          transition={{ duration: orbitDuration, repeat: Infinity, ease: 'linear' }}
+        >
+          {departments.map((dept, index) => {
+            const angle = index * angleStep;
+            return (
+              <UniquePlanet
+                key={index}
+                nameAr={dept.nameAr}
+                nameEn={dept.nameEn}
+                angle={angle}
+                orbitRadius={orbitRadius}
+                primaryColor={dept.color}
+                secondaryColor={dept.secondaryColor}
+                size={dept.size}
+                planetType={dept.planetType}
+                onClick={() => handlePlanetClick(index)}
+                isSelected={selectedPlanet === index}
+              >
+                {dept.subDepartments.map((sub, subIndex) => (
+                  <OrbitingBadge
+                    key={subIndex}
+                    label={sub}
+                    angle={(360 / dept.subDepartments.length) * subIndex}
+                    orbitRadius={dept.size / 2 + 35}
+                    color={dept.color}
+                    size={24}
+                    duration={15 + subIndex * 2}
+                  />
+                ))}
+              </UniquePlanet>
+            );
+          })}
+        </motion.div>
       </motion.div>
 
       {/* Info panel */}
