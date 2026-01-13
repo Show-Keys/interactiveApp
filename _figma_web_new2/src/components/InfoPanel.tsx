@@ -201,10 +201,7 @@ export default function InfoPanel({
                         >
                           <span className="text-white text-xs">{index + 1}</span>
                         </div>
-                        <div
-                          className="text-white/85 flex-1"
-                          style={{ fontWeight: 300, fontSize: '14px', lineHeight: '1.6' }}
-                        >
+                        <div className="text-white/85 flex-1" style={{ fontWeight: 300, fontSize: '14px', lineHeight: '1.6' }}>
                           {resp}
                         </div>
                       </motion.div>

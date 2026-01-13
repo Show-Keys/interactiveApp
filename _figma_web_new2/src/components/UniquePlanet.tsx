@@ -1,7 +1,5 @@
 import { motion } from 'motion/react';
 import { ReactNode } from 'react';
-import { useIsMobile } from './ui/use-mobile';
-import { useReducedMotionLike } from './ui/use-reduced-motion';
 
 interface UniquePlanetProps {
   nameAr: string;
@@ -11,22 +9,7 @@ interface UniquePlanetProps {
   primaryColor: string;
   secondaryColor?: string;
   size: number;
-  planetType:
-    | 'service'
-    | 'media'
-    | 'archive'
-    | 'legal'
-    | 'international'
-    | 'audit'
-    | 'security'
-    | 'cyber'
-    | 'vision'
-    | 'transport'
-    | 'value'
-    | 'coordination'
-    | 'committees'
-    | 'tenders'
-    | 'public-relations';
+  planetType: 'service' | 'media' | 'archive' | 'legal' | 'international' | 'audit' | 'security' | 'cyber' | 'vision' | 'transport' | 'value' | 'coordination' | 'committees' | 'tenders' | 'public-relations';
   onClick?: () => void;
   isSelected?: boolean;
   children?: ReactNode;
@@ -45,10 +28,6 @@ export default function UniquePlanet({
   isSelected = false,
   children,
 }: UniquePlanetProps) {
-  const isMobile = useIsMobile();
-  const reduceMotion = useReducedMotionLike();
-  const liteMode = isMobile || reduceMotion;
-
   const x = Math.cos((angle * Math.PI) / 180) * orbitRadius;
   const y = Math.sin((angle * Math.PI) / 180) * orbitRadius;
 
@@ -61,13 +40,13 @@ export default function UniquePlanet({
             <motion.div
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[90%] h-[90%] rounded-full border-2"
               style={{ borderColor: `${primaryColor}60` }}
-              animate={liteMode ? undefined : { rotate: 360 }}
+              animate={{ rotate: 360 }}
               transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
             />
             <motion.div
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[70%] h-[70%] rounded-full border"
               style={{ borderColor: `${primaryColor}40` }}
-              animate={liteMode ? undefined : { rotate: -360 }}
+              animate={{ rotate: -360 }}
               transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
             />
             {/* Service dots */}
@@ -100,7 +79,7 @@ export default function UniquePlanet({
                   height: `${100 + i * 20}%`,
                   borderColor: `${primaryColor}${(6 - i) * 10}`,
                 }}
-                animate={liteMode ? undefined : { scale: [1, 1.3, 1], opacity: [0.6, 0, 0.6] }}
+                animate={{ scale: [1, 1.3, 1], opacity: [0.6, 0, 0.6] }}
                 transition={{ duration: 3, repeat: Infinity, delay: i * 0.5 }}
               />
             ))}
@@ -148,14 +127,10 @@ export default function UniquePlanet({
                   left: '50%',
                   top: '50%',
                 }}
-                animate={
-                  liteMode
-                    ? undefined
-                    : {
-                        x: Math.cos(((deg * Math.PI) / 180)) * (size * 0.6),
-                        y: Math.sin(((deg * Math.PI) / 180)) * (size * 0.6),
-                      }
-                }
+                animate={{
+                  x: Math.cos(((deg * Math.PI) / 180)) * (size * 0.6),
+                  y: Math.sin(((deg * Math.PI) / 180)) * (size * 0.6),
+                }}
                 transition={{ duration: 8, repeat: Infinity, ease: 'linear', delay: i * 2.67 }}
               />
             ))}
@@ -214,7 +189,7 @@ export default function UniquePlanet({
             {/* Futuristic hexagon pattern */}
             <motion.div
               className="absolute inset-0 rounded-full overflow-hidden opacity-50"
-              animate={liteMode ? undefined : { rotate: 360 }}
+              animate={{ rotate: 360 }}
               transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
             >
               {[0, 60, 120, 180, 240, 300].map((deg) => (
@@ -287,14 +262,36 @@ export default function UniquePlanet({
             </div>
           </>
         );
-
+      
+      case 'committees':
+        return (
+          <>
+            {/* Meeting table pattern */}
+            <div className="absolute inset-0 rounded-full overflow-hidden opacity-40">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/2 h-1/3 rounded-lg border-2" style={{ borderColor: primaryColor }} />
+              {[0, 90, 180, 270].map((deg) => (
+                <div
+                  key={deg}
+                  className="absolute w-2 h-2 rounded-full"
+                  style={{
+                    background: primaryColor,
+                    left: `${50 + 25 * Math.cos((deg * Math.PI) / 180)}%`,
+                    top: `${50 + 25 * Math.sin((deg * Math.PI) / 180)}%`,
+                    transform: 'translate(-50%, -50%)',
+                  }}
+                />
+              ))}
+            </div>
+          </>
+        );
+      
       case 'tenders':
         return (
           <>
             {/* Document and contract layers */}
             <motion.div
               className="absolute inset-0 rounded-full overflow-hidden opacity-40"
-              animate={liteMode ? undefined : { rotate: 360 }}
+              animate={{ rotate: 360 }}
               transition={{ duration: 35, repeat: Infinity, ease: 'linear' }}
             >
               {/* Contract document sheets */}
@@ -326,13 +323,13 @@ export default function UniquePlanet({
                   borderColor: `${secondaryColor || primaryColor}${6 - i * 2}0`,
                   borderStyle: 'dashed',
                 }}
-                animate={liteMode ? undefined : { rotate: i % 2 === 0 ? 360 : -360 }}
+                animate={{ rotate: i % 2 === 0 ? 360 : -360 }}
                 transition={{ duration: 20 + i * 5, repeat: Infinity, ease: 'linear' }}
               />
             ))}
           </>
         );
-
+      
       case 'public-relations':
         return (
           <>
@@ -346,14 +343,7 @@ export default function UniquePlanet({
                   height: `${60 + i * 15}%`,
                   borderColor: `${primaryColor}${7 - i}0`,
                 }}
-                animate={
-                  liteMode
-                    ? undefined
-                    : {
-                        scale: [1, 1.2, 1],
-                        opacity: [0.7, 0.2, 0.7],
-                      }
-                }
+                animate={{ scale: [1, 1.2, 1], opacity: [0.7, 0.2, 0.7] }}
                 transition={{ duration: 4, repeat: Infinity, delay: i * 0.7 }}
               />
             ))}
@@ -369,32 +359,10 @@ export default function UniquePlanet({
                   top: `${50 + 35 * Math.sin((deg * Math.PI) / 180)}%`,
                   transform: 'translate(-50%, -50%)',
                 }}
-                animate={liteMode ? undefined : { scale: [1, 1.3, 1] }}
+                animate={{ scale: [1, 1.3, 1] }}
                 transition={{ duration: 2, repeat: Infinity, delay: (deg / 72) * 0.4 }}
               />
             ))}
-          </>
-        );
-      
-      case 'committees':
-        return (
-          <>
-            {/* Meeting table pattern */}
-            <div className="absolute inset-0 rounded-full overflow-hidden opacity-40">
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-1/2 h-1/3 rounded-lg border-2" style={{ borderColor: primaryColor }} />
-              {[0, 90, 180, 270].map((deg) => (
-                <div
-                  key={deg}
-                  className="absolute w-2 h-2 rounded-full"
-                  style={{
-                    background: primaryColor,
-                    left: `${50 + 25 * Math.cos((deg * Math.PI) / 180)}%`,
-                    top: `${50 + 25 * Math.sin((deg * Math.PI) / 180)}%`,
-                    transform: 'translate(-50%, -50%)',
-                  }}
-                />
-              ))}
-            </div>
           </>
         );
       
@@ -411,7 +379,6 @@ export default function UniquePlanet({
       }}
       onClick={onClick}
     >
-      <div className="orbit-counter">
       {/* Atmospheric glow */}
       <motion.div
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none"
@@ -526,7 +493,6 @@ export default function UniquePlanet({
             {nameEn}
           </div>
         </motion.div>
-      </div>
       </div>
     </motion.div>
   );

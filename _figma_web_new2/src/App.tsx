@@ -1,12 +1,11 @@
-import { useEffect, useMemo, useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import { useState } from 'react';
+import { motion } from 'motion/react';
 import CinematicBackground from './components/CinematicBackground';
 import MinisterSun from './components/MinisterSun';
 import UniquePlanet from './components/UniquePlanet';
 import OrbitingBadge from './components/OrbitingBadge';
 import FloatingNavigation from './components/FloatingNavigation';
 import InfoPanel from './components/InfoPanel';
-import { usePrefersReducedMotion, useReducedMotionLike } from './components/ui/use-reduced-motion';
 import ministryLogo from 'figma:asset/e9f3f4cb580b0827ed78bb6ecbe12efcb70b7930.png';
 
 interface DepartmentData {
@@ -15,22 +14,7 @@ interface DepartmentData {
   color: string;
   secondaryColor?: string;
   size: number;
-  planetType:
-    | 'service'
-    | 'media'
-    | 'archive'
-    | 'legal'
-    | 'international'
-    | 'audit'
-    | 'security'
-    | 'cyber'
-    | 'vision'
-    | 'transport'
-    | 'value'
-    | 'coordination'
-    | 'committees'
-    | 'tenders'
-    | 'public-relations';
+  planetType: 'service' | 'media' | 'archive' | 'legal' | 'international' | 'audit' | 'security' | 'cyber' | 'vision' | 'transport' | 'value' | 'coordination' | 'committees' | 'tenders' | 'public-relations';
   purpose: string;
   subDepartments: string[];
   responsibilities: string[];
@@ -244,126 +228,57 @@ const departments: DepartmentData[] = [
       'التنسيق مع الجهات ذات العلاقة',
     ],
   },
+  {
+    nameAr: 'المناقصات والعقود',
+    nameEn: 'Tenders & Contracts',
+    color: '#4f46e5',
+    secondaryColor: '#6366f1',
+    size: 128,
+    planetType: 'tenders',
+    purpose: 'إدارة المناقصات والعقود بكفاءة عالية وضمان الشفافية في جميع مراحل التعاقد والتنفيذ.',
+    subDepartments: [
+      'قسم إدارة المناقصات',
+      'قسم إدارة العقود وتقييم أداء الشركات',
+      'قسم تصنيف وتأهيل الشركات',
+      'قسم إدارة الأوامر التغييرية'
+    ],
+    responsibilities: [
+      'إعداد ودراسة المناقصات ومراجعة إجراءاتها',
+      'مراجعة التحاليل الفنية والمالية للعطاءات',
+      'إدارة جلسات التفاوض مع الشركات',
+      'إدارة ومتابعة العقود بعد الترسية ميدانيًا وماليًا',
+      'تقييم أداء الشركات المتعاقدة وإدارة النزاعات',
+      'تصنيف وتأهيل الشركات حسب الأنظمة المعتمدة',
+      'إدارة ومتابعة الأوامر التغييرية للعقود',
+      'التأكد من اكتمال الوثائق والمرفقات للأوامر التغييرية',
+    ],
+  },
+  {
+    nameAr: 'دائرة العلاقات العامة',
+    nameEn: 'Public Relations',
+    color: '#f43f5e',
+    size: 115,
+    planetType: 'public-relations',
+    purpose: 'إدارة علاقات الوزارة مع الجمهور والمؤسسات الأخرى لتعزيز صورة الوزارة وبناء الثقة.',
+    subDepartments: ['إدارة العلاقات العامة', 'التسويق', 'العلاقات العامة'],
+    responsibilities: [
+      'إدارة علاقات الوزارة مع الجمهور والمؤسسات الأخرى',
+      'تطوير استراتيجيات التسويق والترويج',
+      'تنظيم الفعاليات والمؤتمرات الصحفية',
+      'إعداد الأخبار والمواد الترويجية',
+      'إدارة العلاقات العامة مع الوسائل الإعلامية',
+    ],
+  },
 ];
 
 export default function App() {
   const [selectedPlanet, setSelectedPlanet] = useState<number | null>(null);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [zoomedPlanet, setZoomedPlanet] = useState<number | null>(null);
-  const [showWelcome, setShowWelcome] = useState(true);
   const [isNavOpen, setIsNavOpen] = useState(false);
 
-  const [viewport, setViewport] = useState(() => {
-    const vv = window.visualViewport;
-    return {
-      width: vv?.width ?? window.innerWidth,
-      height: vv?.height ?? window.innerHeight,
-    };
-  });
-
-  const prefersReducedMotion = usePrefersReducedMotion();
-  const reducedMotionLike = useReducedMotionLike();
-
-  const orbitLayout = useMemo(() => {
-    const rootStyles = getComputedStyle(document.documentElement);
-    const safeTop = Number.parseFloat(rootStyles.getPropertyValue('--safe-top')) || 0;
-    const safeRight = Number.parseFloat(rootStyles.getPropertyValue('--safe-right')) || 0;
-    const safeBottom = Number.parseFloat(rootStyles.getPropertyValue('--safe-bottom')) || 0;
-    const safeLeft = Number.parseFloat(rootStyles.getPropertyValue('--safe-left')) || 0;
-    const viewportPad = Number.parseFloat(rootStyles.getPropertyValue('--viewport-pad')) || 0;
-    const uiTop = Number.parseFloat(rootStyles.getPropertyValue('--ui-top')) || 0;
-    const uiBottom = Number.parseFloat(rootStyles.getPropertyValue('--ui-bottom')) || 0;
-
-    const vw = viewport.width;
-    const vh = viewport.height;
-
-    const usableW = Math.max(0, vw - safeLeft - safeRight);
-    const usableH = Math.max(0, vh - safeTop - safeBottom);
-
-    const centerX = safeLeft + usableW * 0.5;
-
-    const maxPlanetSize = Math.max(...departments.map((d) => d.size));
-    const outerMargin = maxPlanetSize / 2 + 140;
-
-    const contentTop = safeTop + uiTop + viewportPad;
-    const contentBottom = safeTop + usableH - uiBottom - viewportPad;
-
-    const availableHalfW = Math.max(0, usableW * 0.5 - viewportPad);
-    const availableHalfH = Math.max(0, (contentBottom - contentTop) * 0.5);
-
-    // Match the Figma export's orbit radius on sufficiently large screens, and
-    // scale the whole system down on smaller screens instead of shrinking the orbit.
-    const designOrbitRadius = 600;
-    const requiredHalf = designOrbitRadius + outerMargin;
-    const fitScale = requiredHalf > 0 ? Math.min(1, availableHalfW / requiredHalf, availableHalfH / requiredHalf) : 1;
-
-    const orbitRadius = designOrbitRadius;
-    const requiredHalfScaled = requiredHalf * fitScale;
-
-    // Position the system in the upper-middle of the safe content area, but
-    // clamp to ensure it stays fully visible.
-    const minCenterY = contentTop + requiredHalfScaled;
-    const maxCenterY = contentBottom - requiredHalfScaled;
-
-    // On very tall portrait displays (e.g. MagicMirror), the intended design
-    // places the solar system in the upper portion of the screen.
-    const aspect = vh / Math.max(1, vw);
-    const upperMiddleBias = aspect >= 2.4 ? 0.2 : aspect >= 2.0 ? 0.24 : 0.4;
-    const unclampedCenterY = minCenterY + (maxCenterY - minCenterY) * upperMiddleBias;
-    const centerY = Number.isFinite(unclampedCenterY)
-      ? Math.min(Math.max(unclampedCenterY, minCenterY), maxCenterY)
-      : Math.max(0, contentTop + availableHalfH);
-
-    const baseScale = 1;
-
-    return {
-      centerX,
-      centerY,
-      orbitRadius,
-      normalScale: baseScale * fitScale,
-    };
-  }, [viewport.width, viewport.height]);
-
-  const orbitRadius = orbitLayout.orbitRadius;
+  const orbitRadius = 600;
   const angleStep = 360 / departments.length;
-
-  const shouldOrbit = !prefersReducedMotion && !isPanelOpen;
-  const orbitDuration = reducedMotionLike ? 320 : 200;
-
-  useEffect(() => {
-    const timeoutMs = prefersReducedMotion ? 800 : 1800;
-    const t = window.setTimeout(() => setShowWelcome(false), timeoutMs);
-    return () => window.clearTimeout(t);
-  }, [prefersReducedMotion]);
-
-  useEffect(() => {
-    let raf = 0;
-    const update = () => {
-      if (raf) return;
-      raf = window.requestAnimationFrame(() => {
-        raf = 0;
-        const vv = window.visualViewport;
-        setViewport({
-          width: vv?.width ?? window.innerWidth,
-          height: vv?.height ?? window.innerHeight,
-        });
-      });
-    };
-
-    window.addEventListener('resize', update, { passive: true });
-    window.addEventListener('orientationchange', update, { passive: true });
-    window.visualViewport?.addEventListener('resize', update, { passive: true });
-    window.visualViewport?.addEventListener('scroll', update, { passive: true });
-    update();
-
-    return () => {
-      window.removeEventListener('resize', update);
-      window.removeEventListener('orientationchange', update);
-      window.visualViewport?.removeEventListener('resize', update);
-      window.visualViewport?.removeEventListener('scroll', update);
-      if (raf) window.cancelAnimationFrame(raf);
-    };
-  }, []);
 
   const handlePlanetClick = (index: number) => {
     setSelectedPlanet(index);
@@ -390,53 +305,20 @@ export default function App() {
 
   return (
     <div
-      className="fixed inset-0 overflow-hidden"
-      style={{ background: '#000000' }}
+      className="relative overflow-hidden"
+      style={{ width: '1440px', height: '3830px', background: '#000000' }}
     >
-      <AnimatePresence>
-        {showWelcome && (
-          <motion.div
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setShowWelcome(false)}
-          >
-            <motion.div
-              dir="rtl"
-              className="text-center px-10 py-8 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl"
-              initial={{ y: 12, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 12, opacity: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              <div className="text-white text-3xl font-light tracking-wide">
-                مرحبا بكم في البرنامج التفاعلي
-              </div>
-              <div className="text-white/60 text-sm mt-3 font-extralight tracking-widest">
-                TAP TO START
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* Cinematic background */}
       <CinematicBackground />
 
-      {/* Floating navigation (toggleable) */}
-      <AnimatePresence>
-        {isNavOpen && (
-          <FloatingNavigation
-            departments={departments}
-            selectedIndex={selectedPlanet}
-            onSelect={(idx) => {
-              handleNavSelect(idx);
-              setIsNavOpen(false);
-            }}
-          />
-        )}
-      </AnimatePresence>
+      {/* Floating navigation */}
+      {isNavOpen && (
+        <FloatingNavigation
+          departments={departments}
+          selectedIndex={selectedPlanet}
+          onSelect={handleNavSelect}
+        />
+      )}
 
       {/* Ministry logo - Navigation Toggle */}
       <motion.button
@@ -444,12 +326,12 @@ export default function App() {
         initial={{ opacity: 0, x: -50 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 1, delay: 0.3 }}
-        onClick={() => setIsNavOpen((v) => !v)}
+        onClick={() => setIsNavOpen(!isNavOpen)}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        aria-label="Toggle navigation"
       >
         <div className="relative">
+          {/* Animated pulsing glow effect */}
           <motion.div
             className="absolute inset-0 rounded-xl"
             style={{
@@ -457,10 +339,18 @@ export default function App() {
               filter: 'blur(25px)',
               transform: 'scale(1.3)',
             }}
-            animate={{ opacity: [0.4, 0.7, 0.4], scale: [1.2, 1.4, 1.2] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+            animate={{
+              opacity: [0.4, 0.7, 0.4],
+              scale: [1.2, 1.4, 1.2],
+            }}
+            transition={{
+              duration: 2.5,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
           />
-
+          
+          {/* Static glow effect */}
           <div
             className="absolute inset-0 rounded-xl"
             style={{
@@ -469,41 +359,68 @@ export default function App() {
               transform: 'scale(1.3)',
             }}
           />
-
-          <img
-            src={ministryLogo}
-            alt="Ministry Logo"
-            className="relative w-32 h-auto"
-            style={{ filter: 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.3))' }}
-          />
+          
+          {/* Logo container with glass-morphism */}
+          <motion.div 
+            className="relative bg-white/5 backdrop-blur-md rounded-xl p-4 border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.4)] transition-all hover:bg-white/10 hover:border-white/30"
+            animate={{
+              boxShadow: [
+                '0 8px 32px rgba(0,0,0,0.4), 0 0 20px rgba(251, 191, 36, 0.1)',
+                '0 8px 32px rgba(0,0,0,0.4), 0 0 30px rgba(251, 191, 36, 0.3)',
+                '0 8px 32px rgba(0,0,0,0.4), 0 0 20px rgba(251, 191, 36, 0.1)',
+              ],
+            }}
+            transition={{
+              duration: 2.5,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          >
+            <img
+              src={ministryLogo}
+              alt="Ministry Logo"
+              className="w-32 h-auto relative z-10"
+              style={{
+                filter: 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.2))',
+              }}
+            />
+            
+            {/* Interactive indicator - small pulsing dot */}
+            <motion.div
+              className="absolute -top-1 -right-1 w-3 h-3 rounded-full bg-gradient-to-br from-amber-400 to-orange-500"
+              style={{
+                boxShadow: '0 0 10px rgba(251, 191, 36, 0.6)',
+              }}
+              animate={{
+                scale: [1, 1.3, 1],
+                opacity: [1, 0.6, 1],
+              }}
+              transition={{
+                duration: 1.5,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            />
+          </motion.div>
         </div>
       </motion.button>
 
       {/* Solar system container */}
-      <div
-        className="absolute"
-        style={{
-          left: `${orbitLayout.centerX}px`,
-          top: `${orbitLayout.centerY}px`,
-          transform: 'translate(-50%, -50%)',
-        }}
+      <motion.div
+        className="absolute left-1/2 top-[700px] -translate-x-1/2"
+        animate={
+          zoomedPlanet !== null
+            ? {
+                scale: 0.7,
+                y: -150,
+              }
+            : {
+                scale: 1,
+                y: 0,
+              }
+        }
+        transition={{ duration: 0.8, type: 'spring', damping: 20 }}
       >
-        <motion.div
-          className="relative"
-          style={{ width: `${orbitRadius * 2}px`, height: `${orbitRadius * 2}px` }}
-          animate={
-            zoomedPlanet !== null
-              ? {
-                  scale: orbitLayout.normalScale * 0.7,
-                  y: -150,
-                }
-              : {
-                  scale: orbitLayout.normalScale,
-                  y: 0,
-                }
-          }
-          transition={{ duration: 0.8, type: 'spring', damping: 20 }}
-        >
         {/* Main orbit line */}
         <motion.div
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border pointer-events-none"
@@ -514,8 +431,8 @@ export default function App() {
             borderWidth: '1px',
             boxShadow: '0 0 20px rgba(251, 191, 36, 0.1), inset 0 0 20px rgba(251, 191, 36, 0.05)',
           }}
-          animate={shouldOrbit ? { rotate: 360 } : undefined}
-          transition={{ duration: orbitDuration, repeat: Infinity, ease: 'linear' }}
+          animate={{ rotate: 360 }}
+          transition={{ duration: 200, repeat: Infinity, ease: 'linear' }}
         />
 
         {/* Central Sun - Minister's Office */}
@@ -524,51 +441,39 @@ export default function App() {
           isZoomed={zoomedPlanet === null && isPanelOpen}
         />
 
-        {/* Department planets: CSS orbit rotation + counter-rotation keeps labels upright */}
-        <div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 orbit-rotate"
-          style={
-            {
-              width: `${orbitRadius * 2}px`,
-              height: `${orbitRadius * 2}px`,
-              '--orbit-duration': `${orbitDuration}s`,
-              '--orbit-play': shouldOrbit ? 'running' : 'paused',
-            } as React.CSSProperties
-          }
-        >
-          {departments.map((dept, index) => {
-            const angle = index * angleStep;
-            return (
-              <UniquePlanet
-                key={index}
-                nameAr={dept.nameAr}
-                nameEn={dept.nameEn}
-                angle={angle}
-                orbitRadius={orbitRadius}
-                primaryColor={dept.color}
-                secondaryColor={dept.secondaryColor}
-                size={dept.size}
-                planetType={dept.planetType}
-                onClick={() => handlePlanetClick(index)}
-                isSelected={selectedPlanet === index}
-              >
-                {dept.subDepartments.map((sub, subIndex) => (
-                  <OrbitingBadge
-                    key={subIndex}
-                    label={sub}
-                    angle={(360 / dept.subDepartments.length) * subIndex}
-                    orbitRadius={dept.size / 2 + 35}
-                    color={dept.color}
-                    size={24}
-                    duration={15 + subIndex * 2}
-                  />
-                ))}
-              </UniquePlanet>
-            );
-          })}
-        </div>
-        </motion.div>
-      </div>
+        {/* Department planets */}
+        {departments.map((dept, index) => {
+          const angle = index * angleStep;
+          return (
+            <UniquePlanet
+              key={index}
+              nameAr={dept.nameAr}
+              nameEn={dept.nameEn}
+              angle={angle}
+              orbitRadius={orbitRadius}
+              primaryColor={dept.color}
+              secondaryColor={dept.secondaryColor}
+              size={dept.size}
+              planetType={dept.planetType}
+              onClick={() => handlePlanetClick(index)}
+              isSelected={selectedPlanet === index}
+            >
+              {/* Orbiting badges for sub-departments */}
+              {dept.subDepartments.map((sub, subIndex) => (
+                <OrbitingBadge
+                  key={subIndex}
+                  label={sub}
+                  angle={(360 / dept.subDepartments.length) * subIndex}
+                  orbitRadius={dept.size / 2 + 35}
+                  color={dept.color}
+                  size={24}
+                  duration={15 + subIndex * 2}
+                />
+              ))}
+            </UniquePlanet>
+          );
+        })}
+      </motion.div>
 
       {/* Info panel */}
       {selectedPlanet !== null && (
@@ -596,7 +501,7 @@ export default function App() {
           animate={{ opacity: 1 }}
           transition={{ duration: 1.2, delay: 1 }}
         >
-          Made by Shauqi For ministry of transport and communication and technology
+          Made by Shauqi for Ministry of Transport and Communication and Technology
         </motion.div>
       </div>
     </div>
