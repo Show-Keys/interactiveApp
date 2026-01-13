@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'motion/react';
 import CinematicBackground from './components/CinematicBackground';
 import MinisterSun from './components/MinisterSun';
@@ -237,10 +237,58 @@ export default function App() {
   const [zoomedPlanet, setZoomedPlanet] = useState<number | null>(null);
   const [showWelcome, setShowWelcome] = useState(true);
 
+  const [viewport, setViewport] = useState(() => {
+    const vv = window.visualViewport;
+    return {
+      width: vv?.width ?? window.innerWidth,
+      height: vv?.height ?? window.innerHeight,
+    };
+  });
+
   const prefersReducedMotion = usePrefersReducedMotion();
   const reducedMotionLike = useReducedMotionLike();
 
-  const orbitRadius = 600;
+  const orbitLayout = useMemo(() => {
+    const rootStyles = getComputedStyle(document.documentElement);
+    const safeTop = Number.parseFloat(rootStyles.getPropertyValue('--safe-top')) || 0;
+    const safeRight = Number.parseFloat(rootStyles.getPropertyValue('--safe-right')) || 0;
+    const safeBottom = Number.parseFloat(rootStyles.getPropertyValue('--safe-bottom')) || 0;
+    const safeLeft = Number.parseFloat(rootStyles.getPropertyValue('--safe-left')) || 0;
+    const viewportPad = Number.parseFloat(rootStyles.getPropertyValue('--viewport-pad')) || 0;
+
+    const vw = viewport.width;
+    const vh = viewport.height;
+
+    const usableW = Math.max(0, vw - safeLeft - safeRight);
+    const usableH = Math.max(0, vh - safeTop - safeBottom);
+
+    const centerX = safeLeft + usableW * 0.5;
+    const centerY = safeTop + usableH * 0.2;
+
+    const maxPlanetSize = Math.max(...departments.map((d) => d.size));
+    const outerMargin = maxPlanetSize / 2 + 140;
+
+    const maxR = Math.min(
+      usableW * 0.5 - viewportPad - outerMargin,
+      (usableH - centerY) - viewportPad - outerMargin,
+      centerY - viewportPad - outerMargin
+    );
+
+    const orbitRadius = Math.max(0, maxR);
+
+    const baseScale = 0.9;
+    const designOrbitRadius = 600;
+    const fitScale = designOrbitRadius > 0 ? Math.min(1, orbitRadius / designOrbitRadius) : 1;
+
+    return {
+      centerX,
+      centerY,
+      orbitRadius,
+      normalScale: baseScale * fitScale,
+    };
+  }, [viewport.width, viewport.height]);
+
+  const orbitRadius = orbitLayout.orbitRadius;
   const angleStep = 360 / departments.length;
 
   const shouldOrbit = !prefersReducedMotion && !isPanelOpen;
@@ -251,6 +299,35 @@ export default function App() {
     const t = window.setTimeout(() => setShowWelcome(false), timeoutMs);
     return () => window.clearTimeout(t);
   }, [prefersReducedMotion]);
+
+  useEffect(() => {
+    let raf = 0;
+    const update = () => {
+      if (raf) return;
+      raf = window.requestAnimationFrame(() => {
+        raf = 0;
+        const vv = window.visualViewport;
+        setViewport({
+          width: vv?.width ?? window.innerWidth,
+          height: vv?.height ?? window.innerHeight,
+        });
+      });
+    };
+
+    window.addEventListener('resize', update, { passive: true });
+    window.addEventListener('orientationchange', update, { passive: true });
+    window.visualViewport?.addEventListener('resize', update, { passive: true });
+    window.visualViewport?.addEventListener('scroll', update, { passive: true });
+    update();
+
+    return () => {
+      window.removeEventListener('resize', update);
+      window.removeEventListener('orientationchange', update);
+      window.visualViewport?.removeEventListener('resize', update);
+      window.visualViewport?.removeEventListener('scroll', update);
+      if (raf) window.cancelAnimationFrame(raf);
+    };
+  }, []);
 
   const handlePlanetClick = (index: number) => {
     setSelectedPlanet(index);
@@ -277,8 +354,8 @@ export default function App() {
 
   return (
     <div
-      className="relative overflow-hidden"
-      style={{ width: '1440px', height: '3830px', background: '#000000' }}
+      className="fixed inset-0 overflow-hidden"
+      style={{ background: '#000000' }}
     >
       <AnimatePresence>
         {showWelcome && (
@@ -336,22 +413,30 @@ export default function App() {
       </motion.div>
 
       {/* Solar system container */}
-      <motion.div
-        className="absolute left-1/2 top-[820px] -translate-x-1/2 relative"
-        style={{ width: `${orbitRadius * 2}px`, height: `${orbitRadius * 2}px` }}
-        animate={
-          zoomedPlanet !== null
-            ? {
-                scale: 0.7,
-                y: -150,
-              }
-            : {
-                scale: 1,
-                y: 0,
-              }
-        }
-        transition={{ duration: 0.8, type: 'spring', damping: 20 }}
+      <div
+        className="absolute"
+        style={{
+          left: `${orbitLayout.centerX}px`,
+          top: `${orbitLayout.centerY}px`,
+          transform: 'translate(-50%, -50%)',
+        }}
       >
+        <motion.div
+          className="relative"
+          style={{ width: `${orbitRadius * 2}px`, height: `${orbitRadius * 2}px` }}
+          animate={
+            zoomedPlanet !== null
+              ? {
+                  scale: orbitLayout.normalScale * 0.7,
+                  y: -150,
+                }
+              : {
+                  scale: orbitLayout.normalScale,
+                  y: 0,
+                }
+          }
+          transition={{ duration: 0.8, type: 'spring', damping: 20 }}
+        >
         {/* Main orbit line */}
         <motion.div
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border pointer-events-none"
@@ -415,7 +500,8 @@ export default function App() {
             );
           })}
         </div>
-      </motion.div>
+        </motion.div>
+      </div>
 
       {/* Info panel */}
       {selectedPlanet !== null && (
