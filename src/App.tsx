@@ -274,16 +274,6 @@ export default function App() {
   const [showWelcome, setShowWelcome] = useState(true);
   const [isNavOpen, setIsNavOpen] = useState(false);
 
-  // The ministry logo PNG contains generous transparent padding.
-  // We crop + zoom in CSS so it can fill the intended header slot.
-  const ministryLogoCrop = {
-    top: 26,
-    right: 12,
-    bottom: 26,
-    left: 12,
-  };
-  const ministryLogoZoom = 3.2;
-
   const [viewport, setViewport] = useState(() => {
     const vv = window.visualViewport;
     return {
@@ -443,63 +433,42 @@ export default function App() {
       <CinematicBackground />
 
       {/* Ministry logo + Navigation */}
-      <div
-        className="absolute left-0 right-0 top-0 z-50 flex justify-center pointer-events-none"
-        style={{ height: 'clamp(280px, 34vh, 680px)' }}
-      >
-        <div
-          className="pointer-events-auto"
-          style={{ paddingTop: 'clamp(10px, 2vh, 34px)' }}
+      <div className="absolute top-[8vh] left-1/2 -translate-x-1/2 z-50 w-fit">
+        <button
+          className="bg-transparent border-0 p-0 cursor-pointer logo-press"
+          onClick={() => setIsNavOpen((v) => !v)}
+          aria-label="Toggle navigation"
+          style={{ transition: 'transform 150ms ease-out' }}
         >
-          <button
-            className="bg-transparent border-0 p-0 cursor-pointer logo-press"
-            onClick={() => setIsNavOpen((v) => !v)}
-            aria-label="Toggle navigation"
-            style={{ transition: 'transform 150ms ease-out' }}
+          <div
+            className="relative rounded-xl border border-white/12 bg-white/4 px-1 py-0.5 logo-flash"
+            style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.35)' }}
           >
-            <div
-              className="relative rounded-2xl border border-white/12 bg-white/4 logo-flash"
-              style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.35)', width: 'min(96vw, 1200px)' }}
-            >
-              <div
-                className="flex items-center justify-center overflow-hidden"
-                style={{
-                  height: 'clamp(240px, 30vh, 620px)',
-                  width: '100%',
-                }}
-              >
-                <img
-                  src={ministryLogo}
-                  alt="Ministry Logo"
-                  className="block"
-                  style={{
-                    height: '100%',
-                    width: '100%',
-                    maxWidth: 'none',
-                    objectFit: 'cover',
-                    objectPosition: 'center',
-                    imageRendering: 'auto',
-                    clipPath: `inset(${ministryLogoCrop.top}% ${ministryLogoCrop.right}% ${ministryLogoCrop.bottom}% ${ministryLogoCrop.left}%)`,
-                    transform: `scale(${ministryLogoZoom})`,
-                    transformOrigin: 'center',
-                  }}
-                />
-              </div>
-            </div>
-          </button>
+          {/* Minimalist: remove extra glow layer */}
 
-          {isNavOpen && (
-            <FloatingNavigation
-              placement="right-side"
-              departments={departments}
-              selectedIndex={selectedPlanet}
-              onSelect={(idx) => {
-                handleNavSelect(idx);
-                setIsNavOpen(false);
-              }}
-            />
-          )}
-        </div>
+          <img
+            src={ministryLogo}
+            alt="Ministry Logo"
+            className="relative h-auto"
+            style={{
+              width: 48,
+              filter: liteMode ? 'none' : 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.18))',
+            }}
+          />
+          </div>
+        </button>
+
+        {isNavOpen && (
+          <FloatingNavigation
+            placement="right-side"
+            departments={departments}
+            selectedIndex={selectedPlanet}
+            onSelect={(idx) => {
+              handleNavSelect(idx);
+              setIsNavOpen(false);
+            }}
+          />
+        )}
       </div>
 
       {/* Solar system container */}
@@ -519,68 +488,68 @@ export default function App() {
             transform: `scale(${orbitLayout.normalScale}) translate3d(0, 0, 0)`,
           }}
         >
-          {/* Main orbit line */}
-          <div
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border pointer-events-none"
-            style={{
+        {/* Main orbit line */}
+        <div
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border pointer-events-none"
+          style={{
+            width: `${orbitRadius * 2}px`,
+            height: `${orbitRadius * 2}px`,
+            borderColor: 'rgba(251, 191, 36, 0.15)',
+            borderWidth: '1px',
+            boxShadow: '0 0 20px rgba(251, 191, 36, 0.1), inset 0 0 20px rgba(251, 191, 36, 0.05)',
+          }}
+        />
+
+        {/* Central Sun - Minister's Office */}
+        <MinisterSun
+          onClick={() => handleNavSelect(-1)}
+          isZoomed={zoomedPlanet === null && isPanelOpen}
+        />
+
+        {/* Department planets: CSS orbit rotation + counter-rotation keeps labels upright */}
+        <div
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 orbit-rotate"
+          style={
+            {
               width: `${orbitRadius * 2}px`,
               height: `${orbitRadius * 2}px`,
-              borderColor: 'rgba(251, 191, 36, 0.15)',
-              borderWidth: '1px',
-              boxShadow: '0 0 20px rgba(251, 191, 36, 0.1), inset 0 0 20px rgba(251, 191, 36, 0.05)',
-            }}
-          />
-
-          {/* Central Sun - Minister's Office */}
-          <MinisterSun
-            onClick={() => handleNavSelect(-1)}
-            isZoomed={zoomedPlanet === null && isPanelOpen}
-          />
-
-          {/* Department planets: CSS orbit rotation + counter-rotation keeps labels upright */}
-          <div
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 orbit-rotate"
-            style={
-              {
-                width: `${orbitRadius * 2}px`,
-                height: `${orbitRadius * 2}px`,
-                '--orbit-duration': '180s',
-              } as React.CSSProperties
-            }
-          >
-            {departments.map((dept, index) => {
-              const angle = index * angleStep;
-              return (
-                <UniquePlanet
-                  key={index}
-                  nameAr={dept.nameAr}
-                  nameEn={dept.nameEn}
-                  angle={angle}
-                  orbitRadius={orbitRadius}
-                  primaryColor={dept.color}
-                  secondaryColor={dept.secondaryColor}
-                  size={dept.size}
-                  planetType={dept.planetType}
-                  onClick={() => handlePlanetClick(index)}
-                  isSelected={selectedPlanet === index}
-                >
-                  {dept.subDepartments.map((sub, subIndex) => (
-                    <OrbitingBadge
-                      key={subIndex}
-                      label={sub}
-                      angle={(360 / dept.subDepartments.length) * subIndex}
-                      orbitRadius={dept.size / 2 + 35}
-                      color={dept.color}
-                      size={24}
-                    />
-                  ))}
-                </UniquePlanet>
-              );
-            })}
-          </div>
+              '--orbit-duration': '180s',
+            } as React.CSSProperties
+          }
+        >
+          {departments.map((dept, index) => {
+            const angle = index * angleStep;
+            return (
+              <UniquePlanet
+                key={index}
+                nameAr={dept.nameAr}
+                nameEn={dept.nameEn}
+                angle={angle}
+                orbitRadius={orbitRadius}
+                primaryColor={dept.color}
+                secondaryColor={dept.secondaryColor}
+                size={dept.size}
+                planetType={dept.planetType}
+                onClick={() => handlePlanetClick(index)}
+                isSelected={selectedPlanet === index}
+              >
+                {dept.subDepartments.map((sub, subIndex) => (
+                  <OrbitingBadge
+                    key={subIndex}
+                    label={sub}
+                    angle={(360 / dept.subDepartments.length) * subIndex}
+                    orbitRadius={dept.size / 2 + 35}
+                    color={dept.color}
+                    size={24}
+                  />
+                ))}
+              </UniquePlanet>
+            );
+          })}
+        </div>
         </div>
       </div>
-
+//upper part of the screen proptinate with the magic screen 
       {/* Info panel */}
       {selectedPlanet !== null && (
         <InfoPanel
