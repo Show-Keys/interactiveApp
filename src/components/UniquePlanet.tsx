@@ -131,7 +131,7 @@ export default function UniquePlanet({
         return (
           <>
             {/* Orbiting satellites */}
-            {[0, 120, 240].map((deg, i) => (
+            {[0, 120, 240].map((deg) => (
               <div
                 key={deg}
                 className="absolute w-3 h-3 rounded-full"

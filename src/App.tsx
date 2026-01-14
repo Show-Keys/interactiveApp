@@ -286,11 +286,6 @@ export default function App() {
   const reducedMotionLike = useReducedMotionLike();
   const liteMode = reducedMotionLike;
 
-  useEffect(() => {
-    document.documentElement.classList.add('no-anim');
-    return () => document.documentElement.classList.remove('no-anim');
-  }, []);
-
   const orbitLayout = useMemo(() => {
     const rootStyles = getComputedStyle(document.documentElement);
     const safeTop = Number.parseFloat(rootStyles.getPropertyValue('--safe-top')) || 0;
