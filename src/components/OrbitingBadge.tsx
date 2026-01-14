@@ -1,4 +1,3 @@
-import { motion } from 'motion/react';
 import { useIsMobile } from './ui/use-mobile';
 import { useReducedMotionLike } from './ui/use-reduced-motion';
 
@@ -23,8 +22,10 @@ export default function OrbitingBadge({
   const reduceMotion = useReducedMotionLike();
   const liteMode = isMobile || reduceMotion;
 
+  void duration;
+
   return (
-    <motion.div
+    <div
       className="absolute left-1/2 top-1/2 pointer-events-none"
       style={{
         width: `${orbitRadius * 2}px`,
@@ -32,14 +33,8 @@ export default function OrbitingBadge({
         marginLeft: `-${orbitRadius}px`,
         marginTop: `-${orbitRadius}px`,
       }}
-      animate={liteMode ? undefined : { rotate: 360 }}
-      transition={{
-        duration: duration,
-        repeat: Infinity,
-        ease: 'linear',
-      }}
     >
-      <motion.div
+      <div
         className="absolute rounded-full"
         style={{
           width: `${size}px`,
@@ -53,35 +48,14 @@ export default function OrbitingBadge({
           top: `${50 + 50 * Math.sin((angle * Math.PI) / 180)}%`,
           transform: 'translate(-50%, -50%)',
         }}
-        animate={liteMode ? undefined : { rotate: -360 }}
-        transition={{
-          duration: duration,
-          repeat: Infinity,
-          ease: 'linear',
-        }}
       >
-        {/* Badge glow pulse */}
-        <motion.div
+        <div
           className="absolute inset-0 rounded-full"
           style={{
-            background: `radial-gradient(circle, ${color}60, transparent)`,
-          }}
-          animate={
-            liteMode
-              ? undefined
-              : {
-                  scale: [1, 1.4, 1],
-                  opacity: [0.5, 0, 0.5],
-                }
-          }
-          transition={{
-            duration: 2,
-            repeat: Infinity,
-            ease: 'easeInOut',
+            background: `radial-gradient(circle, ${color}35, transparent)`,
           }}
         />
-        
-        {/* Label tooltip */}
+
         <div
           className="absolute left-1/2 top-full mt-1 -translate-x-1/2 whitespace-nowrap px-2 py-1 rounded text-xs text-white/90 opacity-0 group-hover:opacity-100 transition-opacity"
           style={{
@@ -96,7 +70,7 @@ export default function OrbitingBadge({
         >
           {label}
         </div>
-      </motion.div>
-    </motion.div>
+      </div>
+    </div>
   );
 }
