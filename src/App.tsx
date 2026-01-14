@@ -440,7 +440,7 @@ export default function App() {
           aria-label="Toggle navigation"
         >
           <div
-            className="relative rounded-2xl border border-white/12 bg-white/4 px-2.5 py-2"
+            className="relative rounded-2xl border border-white/12 bg-white/4 px-2 py-1.5"
             style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.35)' }}
           >
           {/* Minimalist: remove extra glow layer */}
@@ -448,7 +448,7 @@ export default function App() {
           <img
             src={ministryLogo}
             alt="Ministry Logo"
-            className="relative w-24 h-auto"
+            className="relative w-20 h-auto"
             style={{
               filter: liteMode ? 'none' : 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.18))',
             }}
@@ -458,7 +458,7 @@ export default function App() {
 
         {isNavOpen && (
           <FloatingNavigation
-            placement="below-anchor"
+            placement="right-side"
             departments={departments}
             selectedIndex={selectedPlanet}
             onSelect={(idx) => {

@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { X } from 'lucide-react';
 import { useIsMobile } from './ui/use-mobile';
 import { useReducedMotionLike } from './ui/use-reduced-motion';
@@ -28,21 +29,52 @@ export default function InfoPanel({
   const liteMode = isMobile || reduceMotion;
   const minimalist = true;
 
-  if (!isOpen) return null;
+  const [shouldRender, setShouldRender] = React.useState(isOpen);
+
+  React.useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true);
+      return;
+    }
+
+    const t = window.setTimeout(() => setShouldRender(false), 220);
+    return () => window.clearTimeout(t);
+  }, [isOpen]);
+
+  const toRgba = (hex: string, alpha: number) => {
+    const raw = hex.trim().replace('#', '');
+    if (raw.length !== 6) return `rgba(255,255,255,${alpha})`;
+    const r = parseInt(raw.slice(0, 2), 16);
+    const g = parseInt(raw.slice(2, 4), 16);
+    const b = parseInt(raw.slice(4, 6), 16);
+    return `rgba(${r},${g},${b},${alpha})`;
+  };
+
+  if (!shouldRender) return null;
 
   return (
     <>
       {/* Backdrop */}
-      <div className={'fixed inset-0 bg-black/60 z-40'} onClick={onClose} />
+      <div
+        className="fixed inset-0 z-40 panel-backdrop"
+        onClick={onClose}
+        style={{
+          background: isOpen ? 'rgba(0,0,0,0.62)' : 'rgba(0,0,0,0)',
+          transition: liteMode ? undefined : 'background 220ms ease',
+        }}
+      />
 
       {/* Side panel */}
       <div
-        className="fixed right-0 top-0 bottom-0 w-[500px] z-50 overflow-hidden"
+        className="fixed right-0 top-0 bottom-0 w-[520px] max-w-[92vw] z-50 overflow-hidden panel-anim"
         style={{
+          transform: isOpen ? 'translate3d(0,0,0)' : 'translate3d(24px,0,0)',
+          opacity: isOpen ? 1 : 0.98,
+          transition: liteMode ? undefined : 'transform 220ms ease, opacity 220ms ease',
           background: minimalist
             ? 'rgba(15, 23, 42, 0.98)'
             : 'linear-gradient(to left, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.95))',
-          borderLeft: minimalist ? '1px solid rgba(255, 255, 255, 0.12)' : `2px solid ${color}80`,
+          borderLeft: minimalist ? `1px solid ${toRgba(color, 0.28)}` : `2px solid ${toRgba(color, 0.55)}`,
           boxShadow: minimalist
             ? `-16px 0 44px rgba(0, 0, 0, 0.55)`
             : liteMode
@@ -51,14 +83,34 @@ export default function InfoPanel({
         }}
       >
         <div className="relative h-full flex flex-col">
+          {/* Color wash */}
+          <div
+            className="pointer-events-none absolute inset-0"
+            style={{
+              background: `radial-gradient(1000px 900px at 0% 20%, ${toRgba(color, 0.18)}, transparent 60%), radial-gradient(900px 700px at 100% 0%, ${toRgba(
+                color,
+                0.10
+              )}, transparent 55%)`,
+            }}
+          />
+
           {/* Header */}
-          <div className="p-8 border-b" style={{ borderColor: `${color}30` }}>
-            <button
-              onClick={onClose}
-              className="absolute top-6 right-6 p-2 rounded-full bg-white/5 hover:bg-white/10 transition-colors"
-            >
-              <X className="w-5 h-5 text-white" />
-            </button>
+          <div className="relative p-8 border-b" style={{ borderColor: toRgba(color, 0.22) }}>
+            {/* Close button ABOVE title */}
+            <div className="flex justify-end">
+              <button
+                onClick={onClose}
+                className="p-2 rounded-full bg-white/5 hover:bg-white/10"
+                style={{
+                  border: `1px solid ${toRgba(color, 0.18)}`,
+                  boxShadow: `0 10px 22px rgba(0,0,0,0.35)`,
+                  transition: liteMode ? undefined : 'background 180ms ease, border-color 180ms ease',
+                }}
+                aria-label="Close"
+              >
+                <X className="w-5 h-5 text-white" />
+              </button>
+            </div>
 
             <div
               style={{
@@ -77,14 +129,17 @@ export default function InfoPanel({
             <div
               className="mt-6 h-px"
               style={{
-                background: `linear-gradient(to left, ${color}, transparent)`,
+                background: `linear-gradient(to left, ${toRgba(color, 0.95)}, transparent)`,
                 boxShadow: 'none',
               }}
             />
           </div>
 
           {/* Scrollable content */}
-          <div className="flex-1 overflow-y-auto p-8 space-y-8" style={{ direction: 'rtl', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+          <div
+            className="relative flex-1 overflow-y-auto p-8 space-y-8"
+            style={{ direction: 'rtl', fontFamily: 'system-ui, -apple-system, sans-serif' }}
+          >
             {/* Purpose */}
             <div>
               <div className="text-white/70 text-sm mb-3 tracking-wide" style={{ fontWeight: 300 }}>
@@ -103,8 +158,18 @@ export default function InfoPanel({
                 </div>
                 <div className="space-y-2">
                   {subDepartments.map((sub, index) => (
-                    <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-white/3 border border-white/10">
-                      <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: color, boxShadow: 'none' }} />
+                    <div
+                      key={index}
+                      className="flex items-center gap-3 p-3 rounded-lg border"
+                      style={{
+                        background: toRgba(color, 0.06),
+                        borderColor: toRgba(color, 0.18),
+                      }}
+                    >
+                      <div
+                        className="w-2 h-2 rounded-full flex-shrink-0"
+                        style={{ background: color, boxShadow: `0 0 10px ${toRgba(color, 0.35)}` }}
+                      />
                       <div className="text-white/80 text-sm" style={{ fontWeight: 300 }}>
                         {sub}
                       </div>
@@ -126,14 +191,14 @@ export default function InfoPanel({
                     className="flex items-start gap-4 p-4 rounded-lg border"
                     style={{
                       background: 'rgba(255, 255, 255, 0.02)',
-                      borderColor: 'rgba(255, 255, 255, 0.10)',
+                      borderColor: toRgba(color, 0.16),
                     }}
                   >
                     <div
                       className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
                       style={{
-                        background: 'rgba(255, 255, 255, 0.06)',
-                        border: '1px solid rgba(255, 255, 255, 0.12)',
+                        background: toRgba(color, 0.10),
+                        border: `1px solid ${toRgba(color, 0.22)}`,
                       }}
                     >
                       <span className="text-white text-xs">{index + 1}</span>

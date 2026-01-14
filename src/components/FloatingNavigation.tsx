@@ -11,7 +11,7 @@ interface FloatingNavigationProps {
   departments: Department[];
   selectedIndex: number | null;
   onSelect: (index: number) => void;
-  placement?: 'top-right' | 'below-anchor';
+  placement?: 'top-right' | 'below-anchor' | 'right-side';
 }
 
 export default function FloatingNavigation({
@@ -28,7 +28,9 @@ export default function FloatingNavigation({
   const wrapperClassName =
     placement === 'below-anchor'
       ? 'absolute left-1/2 top-full -translate-x-1/2 mt-4 z-40 max-h-[90vh] overflow-hidden'
-      : 'fixed top-16 right-16 z-40 max-h-[90vh] overflow-hidden';
+      : placement === 'right-side'
+        ? 'fixed top-24 right-6 z-40 max-h-[90vh] overflow-hidden'
+        : 'fixed top-16 right-16 z-40 max-h-[90vh] overflow-hidden';
 
   return (
     <div className={wrapperClassName}>
@@ -85,6 +87,11 @@ export default function FloatingNavigation({
                 fontSize: '14px',
                 letterSpacing: '1.2px',
               }}
+              // animation removed for minimalist UI
+              // animation: !liteMode ? 'fadeInUp 0.8s ease forwards' : undefined
+              //animationDelay: !liteMode ? '0.2s' : undefined
+              // animationFillMode: !liteMode ? 'forwards' : undefined
+              //animationDuration: !liteMode ? '0.8s' : undefined
             >
               MINISTRY NAVIGATION
             </div>

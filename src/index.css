@@ -1822,3 +1822,12 @@ html.no-anim .orbit-counter {
   animation-play-state: var(--orbit-play, running) !important;
   will-change: transform;
 }
+
+/* Allow short, one-time UI transitions (no infinite loops). */
+html.no-anim .panel-anim {
+  transition: transform 220ms ease, opacity 220ms ease !important;
+}
+
+html.no-anim .panel-backdrop {
+  transition: background 220ms ease !important;
+}
