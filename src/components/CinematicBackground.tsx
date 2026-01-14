@@ -30,7 +30,8 @@ export default function CinematicBackground() {
   const liteMode = isMobile || reduceMotion;
 
   const stars = useMemo<Star[]>(() => {
-    const count = liteMode ? 120 : 300;
+    // Kiosk / MagicMirror: keep the DOM and animations very small.
+    const count = liteMode ? 45 : 300;
     return Array.from({ length: count }, (_, i) => ({
       id: i,
       x: Math.random() * 100,
@@ -59,79 +60,77 @@ export default function CinematicBackground() {
     <div className="absolute inset-0 overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-[#000000] via-[#0a0520] to-[#0f0a2e]" />
 
-      <div className="absolute inset-0">
-        <motion.div
-          className="absolute w-[800px] h-[800px] rounded-full blur-3xl opacity-20"
-          style={{
-            background: 'radial-gradient(circle, #8b5cf6, #6366f1, transparent)',
-            top: '10%',
-            left: '15%',
-          }}
-          animate={
-            liteMode
-              ? undefined
-              : {
-                  scale: [1, 1.2, 1],
-                  opacity: [0.15, 0.25, 0.15],
-                }
-          }
-          transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
-        />
+      {!liteMode && (
+        <div className="absolute inset-0">
+          <motion.div
+            className="absolute w-[800px] h-[800px] rounded-full blur-3xl opacity-20"
+            style={{
+              background: 'radial-gradient(circle, #8b5cf6, #6366f1, transparent)',
+              top: '10%',
+              left: '15%',
+            }}
+            animate={{
+              scale: [1, 1.2, 1],
+              opacity: [0.15, 0.25, 0.15],
+            }}
+            transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
+          />
 
-        <motion.div
-          className="absolute w-[700px] h-[700px] rounded-full blur-3xl opacity-20"
-          style={{
-            background: 'radial-gradient(circle, #3b82f6, #06b6d4, transparent)',
-            top: '20%',
-            right: '10%',
-          }}
-          animate={
-            liteMode
-              ? undefined
-              : {
-                  scale: [1, 1.15, 1],
-                  opacity: [0.2, 0.3, 0.2],
-                }
-          }
-          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
-        />
+          <motion.div
+            className="absolute w-[700px] h-[700px] rounded-full blur-3xl opacity-20"
+            style={{
+              background: 'radial-gradient(circle, #3b82f6, #06b6d4, transparent)',
+              top: '20%',
+              right: '10%',
+            }}
+            animate={{
+              scale: [1, 1.15, 1],
+              opacity: [0.2, 0.3, 0.2],
+            }}
+            transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+          />
 
-        <motion.div
-          className="absolute w-[900px] h-[900px] rounded-full blur-3xl opacity-15"
-          style={{
-            background: 'radial-gradient(circle, #f59e0b, #d97706, transparent)',
-            bottom: '5%',
-            left: '50%',
-            transform: 'translateX(-50%)',
-          }}
-          animate={
-            liteMode
-              ? undefined
-              : {
-                  scale: [1, 1.3, 1],
-                  opacity: [0.1, 0.2, 0.1],
-                }
-          }
-          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
-        />
-      </div>
+          <motion.div
+            className="absolute w-[900px] h-[900px] rounded-full blur-3xl opacity-15"
+            style={{
+              background: 'radial-gradient(circle, #f59e0b, #d97706, transparent)',
+              bottom: '5%',
+              left: '50%',
+              transform: 'translateX(-50%)',
+            }}
+            animate={{
+              scale: [1, 1.3, 1],
+              opacity: [0.1, 0.2, 0.1],
+            }}
+            transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+          />
+        </div>
+      )}
 
       {stars.map((star) => (
         <div
           key={star.id}
-          className="absolute rounded-full bg-white twinkle"
+          className={liteMode ? 'absolute rounded-full bg-white' : 'absolute rounded-full bg-white twinkle'}
           style={
-            {
-              left: `${star.x}%`,
-              top: `${star.y}%`,
-              width: `${star.size}px`,
-              height: `${star.size}px`,
-              '--twinkle-duration': `${liteMode ? star.duration + 2 : star.duration}s`,
-              '--twinkle-delay': `${star.delay}s`,
-              '--twinkle-min': String(liteMode ? star.opacity * 0.65 : star.opacity * 0.3),
-              '--twinkle-max': String(star.opacity),
-              '--twinkle-scale': String(liteMode ? 1 : 1.05),
-            } as CSSProperties
+            liteMode
+              ? ({
+                  left: `${star.x}%`,
+                  top: `${star.y}%`,
+                  width: `${star.size}px`,
+                  height: `${star.size}px`,
+                  opacity: star.opacity * 0.7,
+                } as CSSProperties)
+              : ({
+                  left: `${star.x}%`,
+                  top: `${star.y}%`,
+                  width: `${star.size}px`,
+                  height: `${star.size}px`,
+                  '--twinkle-duration': `${star.duration}s`,
+                  '--twinkle-delay': `${star.delay}s`,
+                  '--twinkle-min': String(star.opacity * 0.3),
+                  '--twinkle-max': String(star.opacity),
+                  '--twinkle-scale': '1.05',
+                } as CSSProperties)
           }
         />
       ))}
