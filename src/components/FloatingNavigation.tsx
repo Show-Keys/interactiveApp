@@ -1,4 +1,3 @@
-import { motion } from 'motion/react';
 import { useIsMobile } from './ui/use-mobile';
 import { useReducedMotionLike } from './ui/use-reduced-motion';
 
@@ -31,29 +30,8 @@ export default function FloatingNavigation({
       ? 'absolute left-1/2 top-full -translate-x-1/2 mt-4 z-40 max-h-[90vh] overflow-hidden'
       : 'fixed top-16 right-16 z-40 max-h-[90vh] overflow-hidden';
 
-  const motionProps =
-    placement === 'below-anchor'
-      ? {
-          initial: { y: -10, opacity: 0, scale: 0.985 },
-          animate: { y: 0, opacity: 1, scale: 1 },
-          exit: { y: -10, opacity: 0, scale: 0.985 },
-          transition: { duration: 0.35, type: 'spring' as const, damping: 26 },
-        }
-      : {
-          initial: { x: 150, opacity: 0 },
-          animate: { x: 0, opacity: 1 },
-          exit: { x: 150, opacity: 0 },
-          transition: { duration: 0.6, type: 'spring' as const, damping: 25 },
-        };
-
   return (
-    <motion.div
-      className={wrapperClassName}
-      initial={motionProps.initial}
-      animate={motionProps.animate}
-      exit={motionProps.exit}
-      transition={motionProps.transition}
-    >
+    <div className={wrapperClassName}>
       {/* Elegant glass panel container */}
       <div className="relative">
         {/* Outer glow effect (removed for minimalist UI) */}
@@ -122,7 +100,7 @@ export default function FloatingNavigation({
             }}
           >
             {/* Minister's Office */}
-            <motion.button
+            <button
               className="w-full px-6 py-4 rounded-2xl transition-all relative overflow-hidden active:scale-95"
               style={{
                 background:
@@ -142,7 +120,6 @@ export default function FloatingNavigation({
                 minHeight: '72px',
                 touchAction: 'manipulation',
               }}
-              whileTap={{ scale: 0.95 }}
               onClick={() => onSelect(-1)}
             >
               {selectedIndex === -1 && (
@@ -163,7 +140,7 @@ export default function FloatingNavigation({
                 </div>
                 <div className="text-amber-400 text-2xl ml-4">★</div>
               </div>
-            </motion.button>
+            </button>
 
             <div className="flex items-center gap-4 py-3">
               <div className="flex-1 h-[2px] bg-gradient-to-r from-transparent via-white/25 to-transparent" />
@@ -174,7 +151,7 @@ export default function FloatingNavigation({
             </div>
 
             {departments.map((dept, index) => (
-              <motion.button
+              <button
                 key={index}
                 className="w-full px-6 py-4 rounded-2xl transition-all relative overflow-hidden text-right active:scale-95"
                 style={{
@@ -189,19 +166,17 @@ export default function FloatingNavigation({
                   minHeight: '70px',
                   touchAction: 'manipulation',
                 }}
-                whileTap={{ scale: 0.95 }}
                 onClick={() => onSelect(index)}
               >
-                <motion.div
-                  className="absolute right-0 top-0 bottom-0 w-2 rounded-l-full"
-                  style={{
-                    background: `linear-gradient(180deg, ${dept.color}, ${dept.color}90)`,
-                    boxShadow: minimalist ? 'none' : `0 0 15px ${dept.color}80`,
-                  }}
-                  initial={{ scaleY: 0 }}
-                  animate={{ scaleY: selectedIndex === index ? 1 : 0 }}
-                  transition={{ duration: 0.4, type: 'spring' }}
-                />
+                {selectedIndex === index && (
+                  <div
+                    className="absolute right-0 top-0 bottom-0 w-2 rounded-l-full"
+                    style={{
+                      background: `linear-gradient(180deg, ${dept.color}, ${dept.color}90)`,
+                      boxShadow: minimalist ? 'none' : `0 0 15px ${dept.color}80`,
+                    }}
+                  />
+                )}
 
                 {selectedIndex === index && (
                   <div
@@ -220,28 +195,21 @@ export default function FloatingNavigation({
                     </div>
                   </div>
 
-                  <motion.div
+                  <div
                     className="w-4 h-4 rounded-full ml-3 flex-shrink-0"
                     style={{
                       background: dept.color,
-                      boxShadow: `0 0 12px ${dept.color}`,
-                    }}
-                    animate={{
-                      scale: selectedIndex === index ? [1, 1.2, 1] : 1,
+                      boxShadow: selectedIndex === index ? `0 0 12px ${dept.color}` : 'none',
                       opacity: selectedIndex === index ? 1 : 0.6,
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: selectedIndex === index ? Infinity : 0,
-                      ease: 'easeInOut',
+                      transform: selectedIndex === index ? 'scale(1.15)' : 'scale(1)',
                     }}
                   />
                 </div>
-              </motion.button>
+              </button>
             ))}
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 }
