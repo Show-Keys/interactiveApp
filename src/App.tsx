@@ -449,7 +449,7 @@ export default function App() {
           <img
             src={ministryLogo}
             alt="Ministry Logo"
-            className="relative w-[54px] h-auto"
+            className="relative w-[22px] h-auto"
             style={{
               filter: liteMode ? 'none' : 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.18))',
             }}
