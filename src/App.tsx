@@ -435,12 +435,13 @@ export default function App() {
       {/* Ministry logo + Navigation */}
       <div className="absolute top-6 left-1/2 -translate-x-1/2 z-50 relative w-fit">
         <button
-          className="bg-transparent border-0 p-0 cursor-pointer"
+          className="bg-transparent border-0 p-0 cursor-pointer logo-press"
           onClick={() => setIsNavOpen((v) => !v)}
           aria-label="Toggle navigation"
+          style={{ transition: 'transform 150ms ease-out' }}
         >
           <div
-            className="relative rounded-2xl border border-white/12 bg-white/4 px-2 py-1.5"
+            className="relative rounded-2xl border border-white/12 bg-white/4 px-1.5 py-1 logo-hint"
             style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.35)' }}
           >
           {/* Minimalist: remove extra glow layer */}
@@ -448,7 +449,7 @@ export default function App() {
           <img
             src={ministryLogo}
             alt="Ministry Logo"
-            className="relative w-20 h-auto"
+            className="relative w-16 h-auto"
             style={{
               filter: liteMode ? 'none' : 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.18))',
             }}

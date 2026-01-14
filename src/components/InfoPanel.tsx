@@ -112,6 +112,23 @@ export default function InfoPanel({
               </button>
             </div>
 
+            {/* Planet color line (reveals on open) */}
+            <div className="mt-4">
+              <div
+                className="h-[3px] rounded-full panel-line"
+                style={{
+                  background: `linear-gradient(90deg, transparent, ${toRgba(color, 0.35)}, ${toRgba(color, 0.95)}, ${toRgba(
+                    color,
+                    0.35
+                  )}, transparent)`,
+                  transformOrigin: 'right center',
+                  transform: isOpen ? 'scaleX(1)' : 'scaleX(0)',
+                  transition: liteMode ? undefined : 'transform 420ms cubic-bezier(0.2, 0.9, 0.2, 1)',
+                  boxShadow: `0 0 18px ${toRgba(color, 0.25)}`,
+                }}
+              />
+            </div>
+
             <div
               style={{
                 direction: 'rtl',

@@ -145,7 +145,15 @@ export default function FloatingNavigation({
                     Minister&apos;s Office
                   </div>
                 </div>
-                <div className="text-amber-400 text-2xl ml-4">★</div>
+                <div
+                  className="text-2xl ml-4"
+                  style={{
+                    color: '#fbbf24',
+                    textShadow: '0 0 10px rgba(251, 191, 36, 0.35)',
+                  }}
+                >
+                  ★
+                </div>
               </div>
             </button>
 
