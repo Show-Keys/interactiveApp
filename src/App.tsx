@@ -443,29 +443,50 @@ export default function App() {
       <CinematicBackground />
 
       {/* Ministry logo + Navigation */}
-      <div className="absolute top-6 left-1/2 -translate-x-1/2 z-50 relative w-fit">
-        <button
-          className="bg-transparent border-0 p-0 cursor-pointer logo-press"
-          onClick={() => setIsNavOpen((v) => !v)}
-          aria-label="Toggle navigation"
-          style={{ transition: 'transform 150ms ease-out' }}
+      <div
+        className="absolute left-0 right-0 top-0 z-50 flex justify-center pointer-events-none"
+        style={{ height: 'clamp(280px, 34vh, 680px)' }}
+      >
+        <div
+          className="pointer-events-auto"
+          style={{ paddingTop: 'clamp(10px, 2vh, 34px)' }}
         >
-          <div
-            className="relative rounded-2xl border border-white/12 bg-white/4 px-1.5 py-1 logo-flash"
-            style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.35)' }}
+          <button
+            className="bg-transparent border-0 p-0 cursor-pointer logo-press"
+            onClick={() => setIsNavOpen((v) => !v)}
+            aria-label="Toggle navigation"
+            style={{ transition: 'transform 150ms ease-out' }}
           >
-          {/* Minimalist: remove extra glow layer */}
-
-          <img
-            src={ministryLogo}
-            alt="Ministry Logo"
-            className="relative w-[22px] h-auto"
-            style={{
-              filter: liteMode ? 'none' : 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.18))',
-            }}
-          />
-          </div>
-        </button>
+            <div
+              className="relative rounded-2xl border border-white/12 bg-white/4 logo-flash"
+              style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.35)', width: 'min(96vw, 1200px)' }}
+            >
+              <div
+                className="flex items-center justify-center overflow-hidden"
+                style={{
+                  height: 'clamp(240px, 30vh, 620px)',
+                  width: '100%',
+                }}
+              >
+                <img
+                  src={ministryLogo}
+                  alt="Ministry Logo"
+                  className="block"
+                  style={{
+                    height: '100%',
+                    width: '100%',
+                    maxWidth: 'none',
+                    objectFit: 'cover',
+                    objectPosition: 'center',
+                    imageRendering: 'auto',
+                    clipPath: `inset(${ministryLogoCrop.top}% ${ministryLogoCrop.right}% ${ministryLogoCrop.bottom}% ${ministryLogoCrop.left}%)`,
+                    transform: `scale(${ministryLogoZoom})`,
+                    transformOrigin: 'center',
+                  }}
+                />
+              </div>
+            </div>
+          </button>
 
           {isNavOpen && (
             <FloatingNavigation
