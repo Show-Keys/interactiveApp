@@ -433,7 +433,7 @@ export default function App() {
       <CinematicBackground />
 
       {/* Ministry logo + Navigation */}
-      <div className="absolute top-6 left-1/2 -translate-x-1/2 z-50 relative w-fit">
+      <div className="absolute top-[8vh] left-1/2 -translate-x-1/2 z-50 w-fit">
         <button
           className="bg-transparent border-0 p-0 cursor-pointer logo-press"
           onClick={() => setIsNavOpen((v) => !v)}
@@ -451,7 +451,7 @@ export default function App() {
             alt="Ministry Logo"
             className="relative h-auto"
             style={{
-              width: 32,
+              width: 48,
               filter: liteMode ? 'none' : 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.18))',
             }}
           />
