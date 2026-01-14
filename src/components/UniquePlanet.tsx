@@ -379,7 +379,7 @@ export default function UniquePlanet({
       }}
       onClick={onClick}
     >
-      <div>
+      <div className="orbit-counter" style={{ transformOrigin: 'center' }}>
       {/* Atmospheric glow */}
       <div
         className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full pointer-events-none"

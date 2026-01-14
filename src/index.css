@@ -1809,3 +1809,16 @@ html.no-anim *::after {
   animation: none !important;
   transition: none !important;
 }
+
+/* Allow ONLY the solar-system orbit animation in kiosk mode. */
+html.no-anim .orbit-rotate {
+  animation: orbitRotate var(--orbit-duration, 200s) linear infinite !important;
+  animation-play-state: var(--orbit-play, running) !important;
+  will-change: transform;
+}
+
+html.no-anim .orbit-counter {
+  animation: orbitCounter var(--orbit-duration, 200s) linear infinite !important;
+  animation-play-state: var(--orbit-play, running) !important;
+  will-change: transform;
+}

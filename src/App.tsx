@@ -506,8 +506,14 @@ export default function App() {
 
         {/* Department planets: CSS orbit rotation + counter-rotation keeps labels upright */}
         <div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
-          style={{ width: `${orbitRadius * 2}px`, height: `${orbitRadius * 2}px` }}
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 orbit-rotate"
+          style={
+            {
+              width: `${orbitRadius * 2}px`,
+              height: `${orbitRadius * 2}px`,
+              '--orbit-duration': '180s',
+            } as React.CSSProperties
+          }
         >
           {departments.map((dept, index) => {
             const angle = index * angleStep;
