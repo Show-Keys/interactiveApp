@@ -1,5 +1,3 @@
-import { motion } from 'motion/react';
-
 interface AsteroidProps {
   size: number;
   x: number;
@@ -9,23 +7,15 @@ interface AsteroidProps {
 }
 
 export default function Asteroid({ size, x, y, duration, delay }: AsteroidProps) {
+  void duration;
+  void delay;
+
   return (
-    <motion.div
+    <div
       className="absolute"
       style={{
         left: `${x}%`,
         top: `${y}%`,
-      }}
-      animate={{
-        x: [0, -200, -400],
-        y: [0, 50, -20],
-        rotate: [0, 360, 720],
-      }}
-      transition={{
-        duration: duration,
-        repeat: Infinity,
-        ease: 'linear',
-        delay: delay,
       }}
     >
       <div
@@ -68,6 +58,6 @@ export default function Asteroid({ size, x, y, duration, delay }: AsteroidProps)
           }}
         />
       </div>
-    </motion.div>
+    </div>
   );
 }
