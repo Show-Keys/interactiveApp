@@ -1,4 +1,3 @@
-import { motion } from 'motion/react';
 import { useMemo } from 'react';
 import type { CSSProperties } from 'react';
 import { useIsMobile } from './ui/use-mobile';
@@ -62,35 +61,25 @@ export default function CinematicBackground() {
 
       {!liteMode && (
         <div className="absolute inset-0">
-          <motion.div
+          <div
             className="absolute w-[800px] h-[800px] rounded-full blur-3xl opacity-20"
             style={{
               background: 'radial-gradient(circle, #8b5cf6, #6366f1, transparent)',
               top: '10%',
               left: '15%',
             }}
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.15, 0.25, 0.15],
-            }}
-            transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
           />
 
-          <motion.div
+          <div
             className="absolute w-[700px] h-[700px] rounded-full blur-3xl opacity-20"
             style={{
               background: 'radial-gradient(circle, #3b82f6, #06b6d4, transparent)',
               top: '20%',
               right: '10%',
             }}
-            animate={{
-              scale: [1, 1.15, 1],
-              opacity: [0.2, 0.3, 0.2],
-            }}
-            transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
           />
 
-          <motion.div
+          <div
             className="absolute w-[900px] h-[900px] rounded-full blur-3xl opacity-15"
             style={{
               background: 'radial-gradient(circle, #f59e0b, #d97706, transparent)',
@@ -98,11 +87,6 @@ export default function CinematicBackground() {
               left: '50%',
               transform: 'translateX(-50%)',
             }}
-            animate={{
-              scale: [1, 1.3, 1],
-              opacity: [0.1, 0.2, 0.1],
-            }}
-            transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
           />
         </div>
       )}
@@ -153,6 +137,7 @@ export default function CinematicBackground() {
                 '--drift-x': `${particle.driftX}px`,
                 '--drift-y': '-100px',
               } as CSSProperties
+              // cpacitor backgrouhnd heavaily load 
             }
           />
         ))}
