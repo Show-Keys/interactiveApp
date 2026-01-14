@@ -1797,3 +1797,15 @@ body {
   height: 100%;
   overflow: hidden;
 }
+
+/* Remove non-functional animations (kiosk-friendly). */
+html.no-anim {
+  scroll-behavior: auto;
+}
+
+html.no-anim *,
+html.no-anim *::before,
+html.no-anim *::after {
+  animation: none !important;
+  transition: none !important;
+}

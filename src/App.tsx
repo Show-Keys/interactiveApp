@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
 import CinematicBackground from './components/CinematicBackground';
 import MinisterSun from './components/MinisterSun';
 import UniquePlanet from './components/UniquePlanet';
@@ -287,6 +286,11 @@ export default function App() {
   const reducedMotionLike = useReducedMotionLike();
   const liteMode = reducedMotionLike;
 
+  useEffect(() => {
+    document.documentElement.classList.add('no-anim');
+    return () => document.documentElement.classList.remove('no-anim');
+  }, []);
+
   const orbitLayout = useMemo(() => {
     const rootStyles = getComputedStyle(document.documentElement);
     const safeTop = Number.parseFloat(rootStyles.getPropertyValue('--safe-top')) || 0;
@@ -350,10 +354,7 @@ export default function App() {
   const orbitRadius = orbitLayout.orbitRadius;
   const angleStep = 360 / departments.length;
 
-  // Important for kiosks / MagicMirror: low-end devices may not set the OS
-  // reduced-motion preference, so also gate heavy continuous animations on our heuristic.
-  const shouldOrbit = !prefersReducedMotion && !reducedMotionLike && !isPanelOpen;
-  const orbitDuration = reducedMotionLike ? 320 : 200;
+  // Animations removed for kiosk performance.
 
   useEffect(() => {
     const timeoutMs = prefersReducedMotion ? 800 : 1800;
@@ -418,55 +419,35 @@ export default function App() {
       className="fixed inset-0 overflow-hidden"
       style={{ background: '#000000' }}
     >
-      <AnimatePresence>
-        {showWelcome && (
-          <motion.div
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setShowWelcome(false)}
+      {showWelcome && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85"
+          onClick={() => setShowWelcome(false)}
+        >
+          <div
+            dir="rtl"
+            className="text-center px-10 py-8 rounded-2xl border border-white/10 bg-white/5"
           >
-            <motion.div
-              dir="rtl"
-              className="text-center px-10 py-8 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl"
-              initial={{ y: 12, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: 12, opacity: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              <div className="text-white text-3xl font-light tracking-wide">
-                مرحبا بكم في البرنامج التفاعلي
-              </div>
-              <div className="text-white/60 text-sm mt-3 font-extralight tracking-widest">
-                TAP TO START
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            <div className="text-white text-3xl font-light tracking-wide">مرحبا بكم في البرنامج التفاعلي</div>
+            <div className="text-white/60 text-sm mt-3 font-extralight tracking-widest">TAP TO START</div>
+          </div>
+        </div>
+      )}
 
       {/* Cinematic background */}
       <CinematicBackground />
 
       {/* Ministry logo + Navigation */}
       <div className="absolute top-6 left-1/2 -translate-x-1/2 z-50 relative w-fit">
-        <motion.button
+        <button
           className="bg-transparent border-0 p-0 cursor-pointer"
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 1, delay: 0.3 }}
           onClick={() => setIsNavOpen((v) => !v)}
-          whileHover={liteMode ? undefined : { scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
           aria-label="Toggle navigation"
         >
-        <motion.div
-          className="relative rounded-2xl border border-white/12 bg-white/4 px-2.5 py-2"
-          style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.35)' }}
-          whileHover={liteMode ? undefined : { borderColor: 'rgba(255,255,255,0.22)' }}
-          transition={{ duration: 0.2 }}
-        >
+          <div
+            className="relative rounded-2xl border border-white/12 bg-white/4 px-2.5 py-2"
+            style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.35)' }}
+          >
           {/* Minimalist: remove extra glow layer */}
 
           <img
@@ -477,35 +458,20 @@ export default function App() {
               filter: liteMode ? 'none' : 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.18))',
             }}
           />
+          </div>
+        </button>
 
-          {!liteMode && (
-            <motion.div
-              className="pointer-events-none absolute inset-0 rounded-2xl"
-              style={{
-                background: 'linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.12) 18%, transparent 36%)',
-                mixBlendMode: 'screen',
-              }}
-              initial={{ x: '-120%' }}
-              animate={{ x: ['-120%', '120%'] }}
-              transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut', repeatDelay: 1.6 }}
-            />
-          )}
-        </motion.div>
-        </motion.button>
-
-        <AnimatePresence>
-          {isNavOpen && (
-            <FloatingNavigation
-              placement="below-anchor"
-              departments={departments}
-              selectedIndex={selectedPlanet}
-              onSelect={(idx) => {
-                handleNavSelect(idx);
-                setIsNavOpen(false);
-              }}
-            />
-          )}
-        </AnimatePresence>
+        {isNavOpen && (
+          <FloatingNavigation
+            placement="below-anchor"
+            departments={departments}
+            selectedIndex={selectedPlanet}
+            onSelect={(idx) => {
+              handleNavSelect(idx);
+              setIsNavOpen(false);
+            }}
+          />
+        )}
       </div>
 
       {/* Solar system container */}
@@ -517,24 +483,16 @@ export default function App() {
           transform: 'translate(-50%, -50%)',
         }}
       >
-        <motion.div
+        <div
           className="relative"
-          style={{ width: `${orbitRadius * 2}px`, height: `${orbitRadius * 2}px` }}
-          animate={
-            zoomedPlanet !== null
-              ? {
-                  scale: orbitLayout.normalScale * 0.7,
-                  y: -150,
-                }
-              : {
-                  scale: orbitLayout.normalScale,
-                  y: 0,
-                }
-          }
-          transition={{ duration: 0.8, type: 'spring', damping: 20 }}
+          style={{
+            width: `${orbitRadius * 2}px`,
+            height: `${orbitRadius * 2}px`,
+            transform: `scale(${orbitLayout.normalScale}) translate3d(0, 0, 0)`,
+          }}
         >
         {/* Main orbit line */}
-        <motion.div
+        <div
           className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border pointer-events-none"
           style={{
             width: `${orbitRadius * 2}px`,
@@ -543,8 +501,6 @@ export default function App() {
             borderWidth: '1px',
             boxShadow: '0 0 20px rgba(251, 191, 36, 0.1), inset 0 0 20px rgba(251, 191, 36, 0.05)',
           }}
-          animate={shouldOrbit ? { rotate: 360 } : undefined}
-          transition={{ duration: orbitDuration, repeat: Infinity, ease: 'linear' }}
         />
 
         {/* Central Sun - Minister's Office */}
@@ -555,15 +511,8 @@ export default function App() {
 
         {/* Department planets: CSS orbit rotation + counter-rotation keeps labels upright */}
         <div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 orbit-rotate"
-          style={
-            {
-              width: `${orbitRadius * 2}px`,
-              height: `${orbitRadius * 2}px`,
-              '--orbit-duration': `${orbitDuration}s`,
-              '--orbit-play': shouldOrbit ? 'running' : 'paused',
-            } as React.CSSProperties
-          }
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+          style={{ width: `${orbitRadius * 2}px`, height: `${orbitRadius * 2}px` }}
         >
           {departments.map((dept, index) => {
             const angle = index * angleStep;
@@ -589,14 +538,13 @@ export default function App() {
                     orbitRadius={dept.size / 2 + 35}
                     color={dept.color}
                     size={24}
-                    duration={15 + subIndex * 2}
                   />
                 ))}
               </UniquePlanet>
             );
           })}
         </div>
-        </motion.div>
+        </div>
       </div>
 //upper part of the screen proptinate with the magic screen 
       {/* Info panel */}
@@ -615,18 +563,12 @@ export default function App() {
 
       {/* Footer */}
       <div className="absolute bottom-12 left-0 right-0 text-center z-10">
-        <motion.div
+        <div
           className="text-white/30 text-sm tracking-wide"
-          style={{
-            fontFamily: 'system-ui, -apple-system, sans-serif',
-            fontWeight: 200,
-          }}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1.2, delay: 1 }}
+          style={{ fontFamily: 'system-ui, -apple-system, sans-serif', fontWeight: 200 }}
         >
           Made by Shauqi For ministry of transport and communication and technology
-        </motion.div>
+        </div>
       </div>
     </div>
   );
