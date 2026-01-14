@@ -1907,12 +1907,41 @@
   --font-en: "Century Gothic", "CenturyGothic", "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
+/* Optional webfont loading.
+   If you add licensed font files under /public/fonts, these will be used.
+   If the files are missing, the browser will fall back to local/system fonts. */
+@font-face {
+  font-family: "GE SS";
+  src:
+    local("GE SS Two"),
+    local("GE SS"),
+    url("/fonts/ge-ss.otf") format("opentype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Century Gothic";
+  src:
+    local("Century Gothic"),
+    local("CenturyGothic"),
+    url("/fonts/century-gothic.ttf") format("truetype");
+  font-display: swap;
+}
+
 .font-ar {
   font-family: var(--font-ar);
 }
 
 .font-en {
   font-family: var(--font-en);
+}
+
+/* Helps reduce text flicker when parent is animating/transforming (WebView/Emulator). */
+.text-stable {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: geometricPrecision;
+  backface-visibility: hidden;
+  transform: translateZ(0);
 }
 
 html,
