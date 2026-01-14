@@ -442,7 +442,7 @@ export default function UniquePlanet({
         <div
           style={{
             direction: 'rtl',
-            fontFamily: 'system-ui, -apple-system, sans-serif',
+            fontFamily: 'var(--font-ar)',
           }}
         >
           <div
@@ -462,6 +462,7 @@ export default function UniquePlanet({
             style={{
               fontWeight: 200,
               textShadow: '0 2px 4px rgba(0,0,0,0.8)',
+              fontFamily: 'var(--font-en)',
             }}
           >
             {nameEn}

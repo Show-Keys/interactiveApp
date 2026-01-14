@@ -132,13 +132,16 @@ export default function InfoPanel({
             <div
               style={{
                 direction: 'rtl',
-                fontFamily: 'system-ui, -apple-system, sans-serif',
+                fontFamily: 'var(--font-ar)',
               }}
             >
               <div className="text-white text-3xl mb-2" style={{ fontWeight: 300, textShadow: 'none' }}>
                 {nameAr}
               </div>
-              <div className="text-white/60 text-sm tracking-widest uppercase" style={{ fontWeight: 200 }}>
+              <div
+                className="text-white/60 text-sm tracking-widest uppercase"
+                style={{ fontWeight: 200, fontFamily: 'var(--font-en)' }}
+              >
                 {nameEn}
               </div>
             </div>
@@ -155,7 +158,7 @@ export default function InfoPanel({
           {/* Scrollable content */}
           <div
             className="relative flex-1 overflow-y-auto p-8 space-y-8"
-            style={{ direction: 'rtl', fontFamily: 'system-ui, -apple-system, sans-serif' }}
+            style={{ direction: 'rtl', fontFamily: 'var(--font-ar)' }}
           >
             {/* Purpose */}
             <div>

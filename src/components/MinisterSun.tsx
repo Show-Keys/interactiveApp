@@ -85,7 +85,7 @@ export default function MinisterSun({ onClick, isZoomed }: MinisterSunProps) {
         <div
           style={{
             direction: 'rtl',
-            fontFamily: 'system-ui, -apple-system, sans-serif',
+            fontFamily: 'var(--font-ar)',
           }}
         >
           <div className="text-white text-2xl tracking-wide" style={{ fontWeight: 300, lineHeight: '1.4' }}>
@@ -93,7 +93,10 @@ export default function MinisterSun({ onClick, isZoomed }: MinisterSunProps) {
             <br />
             الوزير
           </div>
-          <div className="text-amber-100 text-xs mt-2 tracking-widest" style={{ fontWeight: 200 }}>
+          <div
+            className="text-amber-100 text-xs mt-2 tracking-widest"
+            style={{ fontWeight: 200, fontFamily: 'var(--font-en)' }}
+          >
             MINISTER&apos;S OFFICE
           </div>
         </div>

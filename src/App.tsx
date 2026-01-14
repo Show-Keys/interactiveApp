@@ -441,7 +441,7 @@ export default function App() {
           style={{ transition: 'transform 150ms ease-out' }}
         >
           <div
-            className="relative rounded-2xl border border-white/12 bg-white/4 px-1.5 py-1 logo-hint"
+            className="relative rounded-2xl border border-white/12 bg-white/4 px-1.5 py-1 logo-flash"
             style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.35)' }}
           >
           {/* Minimalist: remove extra glow layer */}
@@ -567,7 +567,7 @@ export default function App() {
       <div className="absolute bottom-12 left-0 right-0 text-center z-10">
         <div
           className="text-white/30 text-sm tracking-wide"
-          style={{ fontFamily: 'system-ui, -apple-system, sans-serif', fontWeight: 200 }}
+          style={{ fontFamily: 'var(--font-en)', fontWeight: 200 }}
         >
           Made by Shauqi For ministry of transport and communication and technology
         </div>

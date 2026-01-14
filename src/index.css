@@ -1770,9 +1770,57 @@
   }
 }
 
+@keyframes logoFlashGlow {
+  0% {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+  50% {
+    box-shadow:
+      0 10px 30px rgba(0, 0, 0, 0.35),
+      0 0 0 1px rgba(255, 255, 255, 0.14),
+      0 0 26px rgba(251, 191, 36, 0.20);
+    border-color: rgba(251, 191, 36, 0.28);
+  }
+  100% {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+}
+
+@keyframes logoFlashSheen {
+  0% {
+    opacity: 0.0;
+  }
+  35% {
+    opacity: 0.18;
+  }
+  70% {
+    opacity: 0.0;
+  }
+  100% {
+    opacity: 0.0;
+  }
+}
+
 .logo-hint {
   animation: logoHintPulse 900ms ease-in-out 3;
   will-change: transform;
+}
+
+/* Elegant flashing to indicate "button" */
+.logo-flash {
+  animation: logoFlashGlow 2.8s ease-in-out infinite;
+}
+
+.logo-flash::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  pointer-events: none;
+  background: radial-gradient(220px 120px at 50% 10%, rgba(255, 255, 255, 0.18), transparent 55%);
+  animation: logoFlashSheen 2.8s ease-in-out infinite;
 }
 
 .logo-press:active {
@@ -1801,6 +1849,20 @@
   /* Reserved UI space (top nav + footer). JS reads these via getComputedStyle(). */
   --ui-top: clamp(72px, 8vh, 120px);
   --ui-bottom: clamp(80px, 8vh, 140px);
+
+  /* Typography
+     Note: These reference OS-installed fonts. If you want guaranteed rendering on all devices,
+     add licensed webfont files and a matching @font-face. */
+  --font-ar: "GE SS Two", "GE SS", "GESSTwo", "Geeza Pro", "Tahoma", "Arial", sans-serif;
+  --font-en: "Century Gothic", "CenturyGothic", "Segoe UI", system-ui, -apple-system, sans-serif;
+}
+
+.font-ar {
+  font-family: var(--font-ar);
+}
+
+.font-en {
+  font-family: var(--font-en);
 }
 
 html,
@@ -1861,6 +1923,14 @@ html.no-anim .panel-line {
 html.no-anim .logo-hint {
   animation: logoHintPulse 900ms ease-in-out 3 !important;
   will-change: transform;
+}
+
+html.no-anim .logo-flash {
+  animation: logoFlashGlow 2.8s ease-in-out infinite !important;
+}
+
+html.no-anim .logo-flash::after {
+  animation: logoFlashSheen 2.8s ease-in-out infinite !important;
 }
 
 html.no-anim .logo-press {

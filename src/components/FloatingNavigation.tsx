@@ -70,7 +70,7 @@ export default function FloatingNavigation({
               className="text-white text-center mb-3"
               style={{
                 direction: 'rtl',
-                fontFamily: 'system-ui, -apple-system, sans-serif',
+                fontFamily: 'var(--font-ar)',
                 fontWeight: 400,
                 fontSize: '20px',
                 letterSpacing: '0.4px',
@@ -82,7 +82,7 @@ export default function FloatingNavigation({
             <div
               className="text-white text-center"
               style={{
-                fontFamily: 'system-ui, -apple-system, sans-serif',
+                fontFamily: 'var(--font-en)',
                 fontWeight: 300,
                 fontSize: '14px',
                 letterSpacing: '1.2px',
@@ -118,7 +118,7 @@ export default function FloatingNavigation({
                   selectedIndex === -1
                     ? '1px solid rgba(251, 191, 36, 0.55)'
                     : '1px solid rgba(255, 255, 255, 0.12)',
-                fontFamily: 'system-ui, -apple-system, sans-serif',
+                fontFamily: 'var(--font-ar)',
                 direction: 'rtl',
                 boxShadow:
                   selectedIndex === -1
@@ -175,7 +175,7 @@ export default function FloatingNavigation({
                       ? `rgba(255, 255, 255, 0.04)`
                       : 'rgba(255, 255, 255, 0.02)',
                   border: selectedIndex === index ? `1px solid ${dept.color}` : '1px solid rgba(255, 255, 255, 0.1)',
-                  fontFamily: 'system-ui, -apple-system, sans-serif',
+                  fontFamily: 'var(--font-ar)',
                   direction: 'rtl',
                   boxShadow: selectedIndex === index ? '0 10px 26px rgba(0, 0, 0, 0.32)' : '0 8px 20px rgba(0, 0, 0, 0.22)',
                   minHeight: '70px',

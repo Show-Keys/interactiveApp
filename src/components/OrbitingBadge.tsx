@@ -62,7 +62,7 @@ export default function OrbitingBadge({
             background: 'rgba(0, 0, 0, 0.8)',
             backdropFilter: liteMode ? 'none' : 'blur(4px)',
             border: `1px solid ${color}60`,
-            fontFamily: 'system-ui, -apple-system, sans-serif',
+                fontFamily: 'var(--font-ar)',
             fontWeight: 300,
             fontSize: '10px',
             direction: 'rtl',
