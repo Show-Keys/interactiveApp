@@ -24,6 +24,7 @@ export default function FloatingNavigation({
   const isMobile = useIsMobile();
   const reduceMotion = useReducedMotionLike();
   const liteMode = isMobile || reduceMotion;
+  const minimalist = true;
 
   const wrapperClassName =
     placement === 'below-anchor'
@@ -55,49 +56,44 @@ export default function FloatingNavigation({
     >
       {/* Elegant glass panel container */}
       <div className="relative">
-        {/* Outer glow effect */}
-        <div
-          className="absolute inset-0 rounded-[32px]"
-          style={{
-            background:
-              'radial-gradient(circle at top right, rgba(251, 191, 36, 0.2), rgba(139, 92, 246, 0.15), transparent)',
-            filter: liteMode ? 'none' : 'blur(50px)',
-            transform: 'scale(1.15)',
-          }}
-        />
+        {/* Outer glow effect (removed for minimalist UI) */}
 
         {/* Main navigation panel */}
         <div
           className={
-            liteMode
-              ? 'relative px-8 py-7 rounded-[32px] overflow-hidden'
-              : 'relative px-8 py-7 rounded-[32px] backdrop-blur-2xl overflow-hidden'
+            minimalist
+              ? 'relative px-7 py-6 rounded-2xl overflow-hidden'
+              : liteMode
+                ? 'relative px-8 py-7 rounded-[32px] overflow-hidden'
+                : 'relative px-8 py-7 rounded-[32px] backdrop-blur-2xl overflow-hidden'
           }
           style={{
-            background:
-              'linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.95))',
-            border: '2px solid rgba(255, 255, 255, 0.2)',
-            boxShadow:
-              liteMode
+            background: minimalist
+              ? 'rgba(15, 23, 42, 0.9)'
+              : 'linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.95))',
+            border: minimalist ? '1px solid rgba(255, 255, 255, 0.14)' : '2px solid rgba(255, 255, 255, 0.2)',
+            boxShadow: minimalist
+              ? '0 16px 50px rgba(0, 0, 0, 0.55)'
+              : liteMode
                 ? '0 18px 50px rgba(0, 0, 0, 0.6)'
                 : '0 30px 80px rgba(0, 0, 0, 0.7), inset 0 2px 0 rgba(255, 255, 255, 0.2), inset 0 -2px 0 rgba(0, 0, 0, 0.4)',
-            width: '420px',
+            width: minimalist ? '400px' : '420px',
             maxHeight: '90vh',
           }}
         >
-          {/* Decorative top accent */}
-          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+          {/* Minimal top accent */}
+          <div className="absolute top-0 left-0 right-0 h-px bg-white/10" />
 
           {/* Header */}
-          <div className="mb-7 pb-5 border-b-2 border-white/15">
+          <div className="mb-6 pb-4 border-b border-white/10">
             <div
               className="text-white text-center mb-3"
               style={{
                 direction: 'rtl',
                 fontFamily: 'system-ui, -apple-system, sans-serif',
                 fontWeight: 400,
-                fontSize: '22px',
-                letterSpacing: '0.8px',
+                fontSize: '20px',
+                letterSpacing: '0.4px',
                 lineHeight: '1.4',
               }}
             >
@@ -109,7 +105,7 @@ export default function FloatingNavigation({
                 fontFamily: 'system-ui, -apple-system, sans-serif',
                 fontWeight: 300,
                 fontSize: '14px',
-                letterSpacing: '1.5px',
+                letterSpacing: '1.2px',
               }}
             >
               MINISTRY NAVIGATION
@@ -127,36 +123,32 @@ export default function FloatingNavigation({
           >
             {/* Minister's Office */}
             <motion.button
-              className="w-full px-7 py-5 rounded-2xl transition-all relative overflow-hidden active:scale-95"
+              className="w-full px-6 py-4 rounded-2xl transition-all relative overflow-hidden active:scale-95"
               style={{
                 background:
                   selectedIndex === -1
-                    ? 'linear-gradient(135deg, rgba(251, 191, 36, 0.3), rgba(251, 191, 36, 0.2))'
-                    : 'rgba(255, 255, 255, 0.05)',
+                    ? 'rgba(251, 191, 36, 0.16)'
+                    : 'rgba(255, 255, 255, 0.03)',
                 border:
                   selectedIndex === -1
-                    ? '2px solid rgba(251, 191, 36, 0.6)'
-                    : '2px solid rgba(255, 255, 255, 0.12)',
+                    ? '1px solid rgba(251, 191, 36, 0.55)'
+                    : '1px solid rgba(255, 255, 255, 0.12)',
                 fontFamily: 'system-ui, -apple-system, sans-serif',
                 direction: 'rtl',
                 boxShadow:
                   selectedIndex === -1
-                    ? '0 8px 30px rgba(251, 191, 36, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.15)'
-                    : '0 4px 12px rgba(0, 0, 0, 0.3)',
-                minHeight: '80px',
+                    ? '0 10px 30px rgba(0, 0, 0, 0.35)'
+                    : '0 8px 24px rgba(0, 0, 0, 0.25)',
+                minHeight: '72px',
                 touchAction: 'manipulation',
               }}
               whileTap={{ scale: 0.95 }}
               onClick={() => onSelect(-1)}
             >
               {selectedIndex === -1 && (
-                <motion.div
+                <div
                   className="absolute inset-0 rounded-2xl"
-                  style={{
-                    background: 'radial-gradient(circle at center, rgba(251, 191, 36, 0.25), transparent)',
-                  }}
-                  animate={{ opacity: [0.6, 1, 0.6] }}
-                  transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                  style={{ background: 'radial-gradient(circle at center, rgba(251, 191, 36, 0.14), transparent)' }}
                 />
               )}
 
@@ -169,7 +161,7 @@ export default function FloatingNavigation({
                     Minister&apos;s Office
                   </div>
                 </div>
-                <div className="text-amber-400 text-3xl ml-4">★</div>
+                <div className="text-amber-400 text-2xl ml-4">★</div>
               </div>
             </motion.button>
 
@@ -184,20 +176,17 @@ export default function FloatingNavigation({
             {departments.map((dept, index) => (
               <motion.button
                 key={index}
-                className="w-full px-6 py-5 rounded-2xl transition-all relative overflow-hidden text-right active:scale-95"
+                className="w-full px-6 py-4 rounded-2xl transition-all relative overflow-hidden text-right active:scale-95"
                 style={{
                   background:
                     selectedIndex === index
-                      ? `linear-gradient(135deg, ${dept.color}50, ${dept.color}30)`
-                      : 'rgba(255, 255, 255, 0.04)',
-                  border: selectedIndex === index ? `2px solid ${dept.color}` : '2px solid rgba(255, 255, 255, 0.1)',
+                      ? `rgba(255, 255, 255, 0.04)`
+                      : 'rgba(255, 255, 255, 0.02)',
+                  border: selectedIndex === index ? `1px solid ${dept.color}` : '1px solid rgba(255, 255, 255, 0.1)',
                   fontFamily: 'system-ui, -apple-system, sans-serif',
                   direction: 'rtl',
-                  boxShadow:
-                    selectedIndex === index
-                      ? `0 6px 24px ${dept.color}40, inset 0 2px 0 rgba(255, 255, 255, 0.12)`
-                      : '0 3px 10px rgba(0, 0, 0, 0.2)',
-                  minHeight: '76px',
+                  boxShadow: selectedIndex === index ? '0 10px 26px rgba(0, 0, 0, 0.32)' : '0 8px 20px rgba(0, 0, 0, 0.22)',
+                  minHeight: '70px',
                   touchAction: 'manipulation',
                 }}
                 whileTap={{ scale: 0.95 }}
@@ -207,7 +196,7 @@ export default function FloatingNavigation({
                   className="absolute right-0 top-0 bottom-0 w-2 rounded-l-full"
                   style={{
                     background: `linear-gradient(180deg, ${dept.color}, ${dept.color}90)`,
-                    boxShadow: `0 0 15px ${dept.color}80`,
+                    boxShadow: minimalist ? 'none' : `0 0 15px ${dept.color}80`,
                   }}
                   initial={{ scaleY: 0 }}
                   animate={{ scaleY: selectedIndex === index ? 1 : 0 }}
@@ -215,13 +204,9 @@ export default function FloatingNavigation({
                 />
 
                 {selectedIndex === index && (
-                  <motion.div
+                  <div
                     className="absolute inset-0 rounded-2xl"
-                    style={{
-                      background: `radial-gradient(circle at right, ${dept.color}40, transparent)`,
-                    }}
-                    animate={{ opacity: [0.4, 0.7, 0.4] }}
-                    transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+                    style={{ background: `radial-gradient(circle at right, ${dept.color}22, transparent)` }}
                   />
                 )}
 

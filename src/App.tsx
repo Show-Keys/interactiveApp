@@ -462,30 +462,19 @@ export default function App() {
           aria-label="Toggle navigation"
         >
         <motion.div
-          className="relative rounded-2xl border border-white/15 bg-white/5 px-2.5 py-2 backdrop-blur-sm"
-          style={{ boxShadow: '0 12px 40px rgba(0,0,0,0.45)' }}
-          whileHover={liteMode ? undefined : { borderColor: 'rgba(255,255,255,0.28)' }}
+          className="relative rounded-2xl border border-white/12 bg-white/4 px-2.5 py-2"
+          style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.35)' }}
+          whileHover={liteMode ? undefined : { borderColor: 'rgba(255,255,255,0.22)' }}
           transition={{ duration: 0.2 }}
         >
-          {!liteMode && (
-            <motion.div
-              className="absolute inset-0 rounded-2xl"
-              style={{
-                background: 'radial-gradient(circle at 30% 30%, rgba(251, 191, 36, 0.22), transparent 60%)',
-                filter: 'blur(14px)',
-                transform: 'scale(1.15)',
-              }}
-              animate={{ opacity: [0.35, 0.65, 0.35] }}
-              transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
-            />
-          )}
+          {/* Minimalist: remove extra glow layer */}
 
           <img
             src={ministryLogo}
             alt="Ministry Logo"
             className="relative w-24 h-auto"
             style={{
-              filter: liteMode ? 'none' : 'drop-shadow(0 0 14px rgba(255, 255, 255, 0.28))',
+              filter: liteMode ? 'none' : 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.18))',
             }}
           />
 
@@ -493,13 +482,12 @@ export default function App() {
             <motion.div
               className="pointer-events-none absolute inset-0 rounded-2xl"
               style={{
-                background:
-                  'linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.18) 18%, transparent 36%)',
+                background: 'linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.12) 18%, transparent 36%)',
                 mixBlendMode: 'screen',
               }}
               initial={{ x: '-120%' }}
               animate={{ x: ['-120%', '120%'] }}
-              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut', repeatDelay: 1.2 }}
+              transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut', repeatDelay: 1.6 }}
             />
           )}
         </motion.div>

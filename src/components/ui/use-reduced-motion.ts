@@ -32,6 +32,10 @@ export function useReducedMotionLike() {
     const prefersReduced = window.matchMedia?.("(prefers-reduced-motion: reduce)");
 
     const compute = () => {
+      const params = new URLSearchParams(window.location.search);
+      const liteParam = params.get("lite");
+      const forceLite = liteParam === "1" || liteParam === "true" || params.has("lite");
+
       const deviceMemory = getDeviceMemory();
       const cores = typeof navigator.hardwareConcurrency === "number" ? navigator.hardwareConcurrency : undefined;
 
@@ -39,7 +43,17 @@ export function useReducedMotionLike() {
       // even when screen size is large (e.g. kiosks / "magic mirror" devices).
       const isLowEnd = (deviceMemory !== undefined && deviceMemory <= 4) || (cores !== undefined && cores <= 4);
 
-      setReduced(Boolean(prefersReduced?.matches) || isLowEnd);
+      // Some Android WebViews (including kiosk-style devices) don't expose deviceMemory,
+      // and can still struggle with heavy blur + infinite animations.
+      const ua = navigator.userAgent || "";
+      const isAndroid = /Android/i.test(ua);
+      const isWebView = /\bwv\b/i.test(ua) || /Version\/[\d.]+.*Chrome\/[\d.]+/i.test(ua);
+      const isCapacitor = Boolean((window as unknown as { Capacitor?: unknown }).Capacitor);
+      const aspect = window.innerHeight / Math.max(1, window.innerWidth);
+      const isKioskLike = aspect >= 2.1;
+      const isAndroidKioskWebView = (isWebView || isCapacitor) && isAndroid && isKioskLike;
+
+      setReduced(forceLite || Boolean(prefersReduced?.matches) || isLowEnd || isAndroidKioskWebView);
     };
 
     compute();

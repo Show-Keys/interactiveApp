@@ -1,5 +1,7 @@
 import { motion, AnimatePresence } from 'motion/react';
 import { X } from 'lucide-react';
+import { useIsMobile } from './ui/use-mobile';
+import { useReducedMotionLike } from './ui/use-reduced-motion';
 
 interface InfoPanelProps {
   isOpen: boolean;
@@ -22,13 +24,18 @@ export default function InfoPanel({
   responsibilities,
   onClose,
 }: InfoPanelProps) {
+  const isMobile = useIsMobile();
+  const reduceMotion = useReducedMotionLike();
+  const liteMode = isMobile || reduceMotion;
+  const minimalist = true;
+
   return (
     <AnimatePresence>
       {isOpen && (
         <>
           {/* Backdrop */}
           <motion.div
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+            className={'fixed inset-0 bg-black/60 z-40'}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -39,22 +46,20 @@ export default function InfoPanel({
           <motion.div
             className="fixed right-0 top-0 bottom-0 w-[500px] z-50 overflow-hidden"
             style={{
-              background: 'linear-gradient(to left, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.95))',
-              borderLeft: `2px solid ${color}80`,
-              boxShadow: `-20px 0 60px rgba(0, 0, 0, 0.5), inset 0 0 100px ${color}10`,
+              background: minimalist
+                ? 'rgba(15, 23, 42, 0.98)'
+                : 'linear-gradient(to left, rgba(15, 23, 42, 0.98), rgba(30, 41, 59, 0.95))',
+              borderLeft: minimalist ? '1px solid rgba(255, 255, 255, 0.12)' : `2px solid ${color}80`,
+              boxShadow: minimalist ? `-16px 0 44px rgba(0, 0, 0, 0.55)` : liteMode
+                ? `-12px 0 30px rgba(0, 0, 0, 0.45)`
+                : `-20px 0 60px rgba(0, 0, 0, 0.5), inset 0 0 100px ${color}10`,
             }}
             initial={{ x: 500 }}
             animate={{ x: 0 }}
             exit={{ x: 500 }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
           >
-            {/* Decorative glow */}
-            <div
-              className="absolute top-0 right-0 w-full h-64 opacity-20 blur-3xl"
-              style={{
-                background: `radial-gradient(circle at top right, ${color}, transparent)`,
-              }}
-            />
+            {/* Decorative glow (removed for minimalist UI) */}
 
             {/* Content */}
             <div className="relative h-full flex flex-col">
@@ -80,7 +85,7 @@ export default function InfoPanel({
                     className="text-white text-3xl mb-2"
                     style={{
                       fontWeight: 300,
-                      textShadow: `0 0 20px ${color}`,
+                      textShadow: 'none',
                     }}
                   >
                     {nameAr}
@@ -95,10 +100,10 @@ export default function InfoPanel({
 
                 {/* Decorative line */}
                 <motion.div
-                  className="mt-6 h-1 rounded-full"
+                  className="mt-6 h-px"
                   style={{
                     background: `linear-gradient(to left, ${color}, transparent)`,
-                    boxShadow: `0 0 10px ${color}`,
+                    boxShadow: 'none',
                   }}
                   initial={{ scaleX: 0 }}
                   animate={{ scaleX: 1 }}
@@ -144,8 +149,7 @@ export default function InfoPanel({
                       {subDepartments.map((sub, index) => (
                         <motion.div
                           key={index}
-                          className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border"
-                          style={{ borderColor: `${color}20` }}
+                          className="flex items-center gap-3 p-3 rounded-lg bg-white/3 border border-white/10"
                           initial={{ opacity: 0, x: 20 }}
                           animate={{ opacity: 1, x: 0 }}
                           transition={{ delay: 0.5 + index * 0.05 }}
@@ -154,7 +158,7 @@ export default function InfoPanel({
                             className="w-2 h-2 rounded-full flex-shrink-0"
                             style={{
                               background: color,
-                              boxShadow: `0 0 8px ${color}`,
+                              boxShadow: 'none',
                             }}
                           />
                           <div className="text-white/80 text-sm" style={{ fontWeight: 300 }}>
@@ -185,8 +189,8 @@ export default function InfoPanel({
                         key={index}
                         className="flex items-start gap-4 p-4 rounded-lg border"
                         style={{
-                          background: `linear-gradient(135deg, ${color}08, transparent)`,
-                          borderColor: `${color}25`,
+                          background: 'rgba(255, 255, 255, 0.02)',
+                          borderColor: 'rgba(255, 255, 255, 0.10)',
                         }}
                         initial={{ opacity: 0, x: 20 }}
                         animate={{ opacity: 1, x: 0 }}
@@ -195,8 +199,8 @@ export default function InfoPanel({
                         <div
                           className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0"
                           style={{
-                            background: `${color}30`,
-                            border: `1px solid ${color}60`,
+                            background: 'rgba(255, 255, 255, 0.06)',
+                            border: '1px solid rgba(255, 255, 255, 0.12)',
                           }}
                         >
                           <span className="text-white text-xs">{index + 1}</span>

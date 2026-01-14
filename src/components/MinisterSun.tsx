@@ -15,39 +15,36 @@ export default function MinisterSun({ onClick, isZoomed }: MinisterSunProps) {
   return (
     <motion.div
       className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer"
-      whileHover={{ scale: isZoomed ? 1 : 1.08 }}
+      whileHover={liteMode ? undefined : { scale: isZoomed ? 1 : 1.08 }}
       whileTap={{ scale: 0.95 }}
       onClick={onClick}
       animate={isZoomed ? { scale: 1.5 } : { scale: 1 }}
       transition={{ duration: 0.6, type: 'spring' }}
     >
       {/* Radial golden rays */}
-      {[...Array(12)].map((_, i) => (
-        <motion.div
-          key={`ray-${i}`}
-          className="absolute left-1/2 top-1/2 origin-left"
-          style={{
-            width: '400px',
-            height: '2px',
-            background: 'linear-gradient(to right, rgba(251, 191, 36, 0.6), rgba(251, 191, 36, 0.1), transparent)',
-            transform: `translate(-50%, -50%) rotate(${i * 30}deg)`,
-          }}
-          animate={
-            liteMode
-              ? undefined
-              : {
-                  opacity: [0.4, 0.8, 0.4],
-                  scaleX: [1, 1.2, 1],
-                }
-          }
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            delay: i * 0.1,
-            ease: 'easeInOut',
-          }}
-        />
-      ))}
+      {!liteMode &&
+        [...Array(12)].map((_, i) => (
+          <motion.div
+            key={`ray-${i}`}
+            className="absolute left-1/2 top-1/2 origin-left"
+            style={{
+              width: '400px',
+              height: '2px',
+              background: 'linear-gradient(to right, rgba(251, 191, 36, 0.6), rgba(251, 191, 36, 0.1), transparent)',
+              transform: `translate(-50%, -50%) rotate(${i * 30}deg)`,
+            }}
+            animate={{
+              opacity: [0.4, 0.8, 0.4],
+              scaleX: [1, 1.2, 1],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              delay: i * 0.1,
+              ease: 'easeInOut',
+            }}
+          />
+        ))}
       
       {/* Outer glow rings */}
       <motion.div
@@ -96,7 +93,9 @@ export default function MinisterSun({ onClick, isZoomed }: MinisterSunProps) {
         className="relative w-[220px] h-[220px] rounded-full"
         style={{
           background: 'radial-gradient(circle at 35% 35%, #fef3c7, #fbbf24, #f59e0b, #d97706)',
-          boxShadow: '0 0 80px rgba(251, 191, 36, 0.8), 0 0 150px rgba(251, 191, 36, 0.5), inset 0 0 60px rgba(255, 255, 255, 0.3)',
+          boxShadow: liteMode
+            ? '0 0 22px rgba(251, 191, 36, 0.55), inset 0 0 18px rgba(255, 255, 255, 0.22)'
+            : '0 0 80px rgba(251, 191, 36, 0.8), 0 0 150px rgba(251, 191, 36, 0.5), inset 0 0 60px rgba(255, 255, 255, 0.3)',
         }}
         animate={
           liteMode
@@ -116,11 +115,13 @@ export default function MinisterSun({ onClick, isZoomed }: MinisterSunProps) {
         }}
       >
         {/* Surface texture */}
-        <div className="absolute inset-0 rounded-full overflow-hidden">
-          <div className="absolute top-[15%] left-[20%] w-[40%] h-[40%] rounded-full bg-white/30 blur-xl" />
-          <div className="absolute top-[40%] right-[25%] w-[25%] h-[25%] rounded-full bg-white/20 blur-lg" />
-          <div className="absolute bottom-[30%] left-[30%] w-[30%] h-[30%] rounded-full bg-orange-400/20 blur-lg" />
-        </div>
+        {!liteMode && (
+          <div className="absolute inset-0 rounded-full overflow-hidden">
+            <div className="absolute top-[15%] left-[20%] w-[40%] h-[40%] rounded-full bg-white/30 blur-xl" />
+            <div className="absolute top-[40%] right-[25%] w-[25%] h-[25%] rounded-full bg-white/20 blur-lg" />
+            <div className="absolute bottom-[30%] left-[30%] w-[30%] h-[30%] rounded-full bg-orange-400/20 blur-lg" />
+          </div>
+        )}
         
         {/* Rotating corona ring */}
         <motion.div

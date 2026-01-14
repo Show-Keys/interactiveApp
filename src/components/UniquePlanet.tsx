@@ -420,15 +420,15 @@ export default function UniquePlanet({
           height: `${size + 60}px`,
           background: `radial-gradient(circle, ${primaryColor}40 0%, ${primaryColor}15 40%, transparent 70%)`,
         }}
-        animate={{
-          scale: [1, 1.1, 1],
-          opacity: [0.5, 0.8, 0.5],
-        }}
-        transition={{
-          duration: 3,
-          repeat: Infinity,
-          ease: 'easeInOut',
-        }}
+        animate={
+          liteMode
+            ? undefined
+            : {
+                scale: [1, 1.1, 1],
+                opacity: [0.5, 0.8, 0.5],
+              }
+        }
+        transition={liteMode ? undefined : { duration: 3, repeat: Infinity, ease: 'easeInOut' }}
       />
 
       {/* Main planet body */}
@@ -440,27 +440,45 @@ export default function UniquePlanet({
           background: secondaryColor 
             ? `radial-gradient(circle at 30% 30%, ${primaryColor}ff, ${secondaryColor}dd, ${primaryColor}aa, ${secondaryColor}77)`
             : `radial-gradient(circle at 30% 30%, ${primaryColor}ff, ${primaryColor}cc, ${primaryColor}99, ${primaryColor}66)`,
-          boxShadow: `0 0 30px ${primaryColor}80, 0 0 60px ${primaryColor}40, inset -10px -10px 30px rgba(0,0,0,0.5), inset 5px 5px 20px rgba(255,255,255,0.1)`,
+          boxShadow: liteMode
+            ? `0 0 14px ${primaryColor}66, inset -6px -6px 14px rgba(0,0,0,0.45), inset 3px 3px 10px rgba(255,255,255,0.08)`
+            : `0 0 30px ${primaryColor}80, 0 0 60px ${primaryColor}40, inset -10px -10px 30px rgba(0,0,0,0.5), inset 5px 5px 20px rgba(255,255,255,0.1)`,
           border: `1px solid ${primaryColor}80`,
         }}
-        animate={isSelected ? { 
-          rotate: 360,
-          scale: 1.15,
-          boxShadow: `0 0 60px ${primaryColor}ff, 0 0 100px ${primaryColor}80, inset -10px -10px 30px rgba(0,0,0,0.5), inset 5px 5px 20px rgba(255,255,255,0.1)`,
-        } : { 
-          rotate: 360 
-        }}
-        transition={isSelected ? {
-          rotate: { duration: 60, repeat: Infinity, ease: 'linear' },
-          scale: { duration: 0.4, type: 'spring' },
-          boxShadow: { duration: 0.4 },
-        } : { 
-          duration: 60, repeat: Infinity, ease: 'linear' 
-        }}
-        whileHover={{
-          boxShadow: `0 0 50px ${primaryColor}cc, 0 0 90px ${primaryColor}60, inset -10px -10px 30px rgba(0,0,0,0.5), inset 5px 5px 20px rgba(255,255,255,0.1)`,
-          scale: 1.08,
-        }}
+        animate={
+          liteMode
+            ? isSelected
+              ? { scale: 1.08 }
+              : undefined
+            : isSelected
+              ? {
+                  rotate: 360,
+                  scale: 1.15,
+                  boxShadow: `0 0 60px ${primaryColor}ff, 0 0 100px ${primaryColor}80, inset -10px -10px 30px rgba(0,0,0,0.5), inset 5px 5px 20px rgba(255,255,255,0.1)`,
+                }
+              : { rotate: 360 }
+        }
+        transition={
+          liteMode
+            ? isSelected
+              ? { duration: 0.25, type: 'spring' }
+              : undefined
+            : isSelected
+              ? {
+                  rotate: { duration: 60, repeat: Infinity, ease: 'linear' },
+                  scale: { duration: 0.4, type: 'spring' },
+                  boxShadow: { duration: 0.4 },
+                }
+              : { duration: 60, repeat: Infinity, ease: 'linear' }
+        }
+        whileHover={
+          liteMode
+            ? undefined
+            : {
+                boxShadow: `0 0 50px ${primaryColor}cc, 0 0 90px ${primaryColor}60, inset -10px -10px 30px rgba(0,0,0,0.5), inset 5px 5px 20px rgba(255,255,255,0.1)`,
+                scale: 1.08,
+              }
+        }
         whileTap={{ scale: 0.98 }}
       >
         {/* Highlight spot */}
@@ -482,8 +500,8 @@ export default function UniquePlanet({
             height: `${size + 30}px`,
             borderColor: `${primaryColor}40`,
           }}
-          animate={{ rotate: -360 }}
-          transition={{ duration: 25, repeat: Infinity, ease: 'linear' }}
+          animate={liteMode ? undefined : { rotate: -360 }}
+          transition={liteMode ? undefined : { duration: 25, repeat: Infinity, ease: 'linear' }}
         />
       </motion.div>
 
