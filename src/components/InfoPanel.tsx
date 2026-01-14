@@ -95,7 +95,16 @@ export default function InfoPanel({
           />
 
           {/* Header */}
-          <div className="relative p-8 border-b" style={{ borderColor: toRgba(color, 0.22) }}>
+          <div
+            className="relative p-8 border-b"
+            style={
+              {
+                borderColor: toRgba(color, 0.22),
+                '--panel-line': toRgba(color, 0.95),
+                '--panel-line-soft': toRgba(color, 0.35),
+              } as React.CSSProperties
+            }
+          >
             {/* Close button ABOVE title */}
             <div className="flex justify-end">
               <button
@@ -110,23 +119,6 @@ export default function InfoPanel({
               >
                 <X className="w-5 h-5 text-white" />
               </button>
-            </div>
-
-            {/* Planet color line (reveals on open) */}
-            <div className="mt-4">
-              <div
-                className="h-[3px] rounded-full panel-line"
-                style={{
-                  background: `linear-gradient(90deg, transparent, ${toRgba(color, 0.35)}, ${toRgba(color, 0.95)}, ${toRgba(
-                    color,
-                    0.35
-                  )}, transparent)`,
-                  transformOrigin: 'right center',
-                  transform: isOpen ? 'scaleX(1)' : 'scaleX(0)',
-                  transition: liteMode ? undefined : 'transform 420ms cubic-bezier(0.2, 0.9, 0.2, 1)',
-                  boxShadow: `0 0 18px ${toRgba(color, 0.25)}`,
-                }}
-              />
             </div>
 
             <div
@@ -146,13 +138,18 @@ export default function InfoPanel({
               </div>
             </div>
 
-            <div
-              className="mt-6 h-px"
-              style={{
-                background: `linear-gradient(to left, ${toRgba(color, 0.95)}, transparent)`,
-                boxShadow: 'none',
-              }}
-            />
+            {/* Divider line (slides in AFTER panel) */}
+            <div className="mt-6">
+              <div
+                className={isOpen ? 'panel-divider panel-divider--on' : 'panel-divider'}
+                style={{
+                  transformOrigin: 'right center',
+                  transform: isOpen ? 'scaleX(1)' : 'scaleX(0)',
+                  transition: liteMode ? undefined : 'transform 420ms cubic-bezier(0.2, 0.9, 0.2, 1)',
+                  transitionDelay: liteMode ? undefined : isOpen ? '200ms' : '0ms',
+                }}
+              />
+            </div>
           </div>
 
           {/* Scrollable content */}

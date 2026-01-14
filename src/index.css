@@ -1803,6 +1803,20 @@
   }
 }
 
+@keyframes panelDividerSweep {
+  0% {
+    transform: translate3d(110%, 0, 0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(-110%, 0, 0);
+    opacity: 0;
+  }
+}
+
 .logo-hint {
   animation: logoHintPulse 900ms ease-in-out 3;
   will-change: transform;
@@ -1825,6 +1839,42 @@
 
 .logo-press:active {
   transform: scale(0.96);
+}
+
+.panel-divider {
+  position: relative;
+  height: 3px;
+  border-radius: 9999px;
+  overflow: hidden;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--panel-line-soft, rgba(255, 255, 255, 0.18)),
+    var(--panel-line, rgba(255, 255, 255, 0.9)),
+    var(--panel-line-soft, rgba(255, 255, 255, 0.18)),
+    transparent
+  );
+  box-shadow: 0 0 18px rgba(0, 0, 0, 0.25);
+}
+
+.panel-divider::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  mix-blend-mode: screen;
+  opacity: 0;
+  transform: translate3d(110%, 0, 0);
+}
+
+.panel-divider--on {
+  box-shadow: 0 0 18px var(--panel-line-soft, rgba(255, 255, 255, 0.18));
+}
+
+.panel-divider--on::after {
+  animation: panelDividerSweep 700ms ease-out 1;
+  animation-delay: 360ms;
+  will-change: transform, opacity;
 }
 
 .orbit-rotate {
@@ -1917,6 +1967,15 @@ html.no-anim .panel-backdrop {
 
 html.no-anim .panel-line {
   transition: transform 420ms cubic-bezier(0.2, 0.9, 0.2, 1) !important;
+}
+
+html.no-anim .panel-divider {
+  transition: transform 420ms cubic-bezier(0.2, 0.9, 0.2, 1) !important;
+}
+
+html.no-anim .panel-divider--on::after {
+  animation: panelDividerSweep 700ms ease-out 1 !important;
+  animation-delay: 360ms !important;
 }
 
 /* Allow the logo hint + press interaction in kiosk mode (finite, transform-only). */
