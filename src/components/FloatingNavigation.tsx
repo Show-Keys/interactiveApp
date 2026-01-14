@@ -27,7 +27,7 @@ export default function FloatingNavigation({
 
   const wrapperClassName =
     placement === 'below-anchor'
-      ? 'absolute left-0 top-full mt-4 z-40 max-h-[90vh] overflow-hidden'
+      ? 'absolute left-1/2 top-full -translate-x-1/2 mt-4 z-40 max-h-[90vh] overflow-hidden'
       : 'fixed top-16 right-16 z-40 max-h-[90vh] overflow-hidden';
 
   const motionProps =

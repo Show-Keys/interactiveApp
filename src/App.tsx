@@ -450,7 +450,7 @@ export default function App() {
       <CinematicBackground />
 
       {/* Ministry logo + Navigation */}
-      <div className="absolute top-8 left-8 z-50 relative">
+      <div className="absolute top-6 left-1/2 -translate-x-1/2 z-50 relative w-fit">
         <motion.button
           className="bg-transparent border-0 p-0 cursor-pointer"
           initial={{ opacity: 0, x: -50 }}
@@ -462,7 +462,7 @@ export default function App() {
           aria-label="Toggle navigation"
         >
         <motion.div
-          className="relative rounded-2xl border border-white/15 bg-white/5 px-3 py-2 backdrop-blur-sm"
+          className="relative rounded-2xl border border-white/15 bg-white/5 px-2.5 py-2 backdrop-blur-sm"
           style={{ boxShadow: '0 12px 40px rgba(0,0,0,0.45)' }}
           whileHover={liteMode ? undefined : { borderColor: 'rgba(255,255,255,0.28)' }}
           transition={{ duration: 0.2 }}
@@ -483,7 +483,7 @@ export default function App() {
           <img
             src={ministryLogo}
             alt="Ministry Logo"
-            className="relative w-28 h-auto"
+            className="relative w-24 h-auto"
             style={{
               filter: liteMode ? 'none' : 'drop-shadow(0 0 14px rgba(255, 255, 255, 0.28))',
             }}
