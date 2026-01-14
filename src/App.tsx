@@ -244,6 +244,28 @@ const departments: DepartmentData[] = [
       'التنسيق مع الجهات ذات العلاقة',
     ],
   },
+  {
+    nameAr: 'دائرة العلاقات العامة',
+    nameEn: 'Public Relations',
+    color: '#f472b6',
+    secondaryColor: '#fb7185',
+    size: 118,
+    planetType: 'public-relations',
+    purpose: 'تعزيز صورة الوزارة وإدارة بروتوكولات الاستقبال والضيافة وتنظيم الأنشطة والفعاليات.',
+    subDepartments: ['قسم الاستقبال والضيافة', 'قسم الأنشطة والفعاليات'],
+    responsibilities: [
+      'الاستقبال والضيافة',
+      'حجز القاعات',
+      'حجز الغرف',
+      'التأشيرات والجوازات',
+      'تصاريح المطار',
+      'تنظيم الفعاليات',
+      'تنظيم الأنشطة',
+      'إعداد العروض',
+      'طلب الرعايات',
+      'تنسيق الهدايا',
+    ],
+  },
 ];
 
 export default function App() {
@@ -263,6 +285,7 @@ export default function App() {
 
   const prefersReducedMotion = usePrefersReducedMotion();
   const reducedMotionLike = useReducedMotionLike();
+  const liteMode = reducedMotionLike;
 
   const orbitLayout = useMemo(() => {
     const rootStyles = getComputedStyle(document.documentElement);
@@ -327,7 +350,9 @@ export default function App() {
   const orbitRadius = orbitLayout.orbitRadius;
   const angleStep = 360 / departments.length;
 
-  const shouldOrbit = !prefersReducedMotion && !isPanelOpen;
+  // Important for kiosks / MagicMirror: low-end devices may not set the OS
+  // reduced-motion preference, so also gate heavy continuous animations on our heuristic.
+  const shouldOrbit = !prefersReducedMotion && !reducedMotionLike && !isPanelOpen;
   const orbitDuration = reducedMotionLike ? 320 : 200;
 
   useEffect(() => {
@@ -424,60 +449,76 @@ export default function App() {
       {/* Cinematic background */}
       <CinematicBackground />
 
-      {/* Floating navigation (toggleable) */}
-      <AnimatePresence>
-        {isNavOpen && (
-          <FloatingNavigation
-            departments={departments}
-            selectedIndex={selectedPlanet}
-            onSelect={(idx) => {
-              handleNavSelect(idx);
-              setIsNavOpen(false);
-            }}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Ministry logo - Navigation Toggle */}
-      <motion.button
-        className="absolute top-8 left-8 z-50 bg-transparent border-0 p-0 cursor-pointer"
-        initial={{ opacity: 0, x: -50 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 1, delay: 0.3 }}
-        onClick={() => setIsNavOpen((v) => !v)}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        aria-label="Toggle navigation"
-      >
-        <div className="relative">
-          <motion.div
-            className="absolute inset-0 rounded-xl"
-            style={{
-              background: 'radial-gradient(circle, rgba(251, 191, 36, 0.25), transparent)',
-              filter: 'blur(25px)',
-              transform: 'scale(1.3)',
-            }}
-            animate={{ opacity: [0.4, 0.7, 0.4], scale: [1.2, 1.4, 1.2] }}
-            transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-          />
-
-          <div
-            className="absolute inset-0 rounded-xl"
-            style={{
-              background: 'radial-gradient(circle, rgba(251, 191, 36, 0.15), transparent)',
-              filter: 'blur(20px)',
-              transform: 'scale(1.3)',
-            }}
-          />
+      {/* Ministry logo + Navigation */}
+      <div className="absolute top-8 left-8 z-50 relative">
+        <motion.button
+          className="bg-transparent border-0 p-0 cursor-pointer"
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 1, delay: 0.3 }}
+          onClick={() => setIsNavOpen((v) => !v)}
+          whileHover={liteMode ? undefined : { scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          aria-label="Toggle navigation"
+        >
+        <motion.div
+          className="relative rounded-2xl border border-white/15 bg-white/5 px-3 py-2 backdrop-blur-sm"
+          style={{ boxShadow: '0 12px 40px rgba(0,0,0,0.45)' }}
+          whileHover={liteMode ? undefined : { borderColor: 'rgba(255,255,255,0.28)' }}
+          transition={{ duration: 0.2 }}
+        >
+          {!liteMode && (
+            <motion.div
+              className="absolute inset-0 rounded-2xl"
+              style={{
+                background: 'radial-gradient(circle at 30% 30%, rgba(251, 191, 36, 0.22), transparent 60%)',
+                filter: 'blur(14px)',
+                transform: 'scale(1.15)',
+              }}
+              animate={{ opacity: [0.35, 0.65, 0.35] }}
+              transition={{ duration: 2.8, repeat: Infinity, ease: 'easeInOut' }}
+            />
+          )}
 
           <img
             src={ministryLogo}
             alt="Ministry Logo"
-            className="relative w-32 h-auto"
-            style={{ filter: 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.3))' }}
+            className="relative w-28 h-auto"
+            style={{
+              filter: liteMode ? 'none' : 'drop-shadow(0 0 14px rgba(255, 255, 255, 0.28))',
+            }}
           />
-        </div>
-      </motion.button>
+
+          {!liteMode && (
+            <motion.div
+              className="pointer-events-none absolute inset-0 rounded-2xl"
+              style={{
+                background:
+                  'linear-gradient(120deg, transparent 0%, rgba(255,255,255,0.18) 18%, transparent 36%)',
+                mixBlendMode: 'screen',
+              }}
+              initial={{ x: '-120%' }}
+              animate={{ x: ['-120%', '120%'] }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut', repeatDelay: 1.2 }}
+            />
+          )}
+        </motion.div>
+        </motion.button>
+
+        <AnimatePresence>
+          {isNavOpen && (
+            <FloatingNavigation
+              placement="below-anchor"
+              departments={departments}
+              selectedIndex={selectedPlanet}
+              onSelect={(idx) => {
+                handleNavSelect(idx);
+                setIsNavOpen(false);
+              }}
+            />
+          )}
+        </AnimatePresence>
+      </div>
 
       {/* Solar system container */}
       <div
@@ -569,7 +610,7 @@ export default function App() {
         </div>
         </motion.div>
       </div>
-
+//upper part of the screen proptinate with the magic screen 
       {/* Info panel */}
       {selectedPlanet !== null && (
         <InfoPanel

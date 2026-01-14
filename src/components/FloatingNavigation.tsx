@@ -1,4 +1,6 @@
 import { motion } from 'motion/react';
+import { useIsMobile } from './ui/use-mobile';
+import { useReducedMotionLike } from './ui/use-reduced-motion';
 
 interface Department {
   nameAr: string;
@@ -10,16 +12,46 @@ interface FloatingNavigationProps {
   departments: Department[];
   selectedIndex: number | null;
   onSelect: (index: number) => void;
+  placement?: 'top-right' | 'below-anchor';
 }
 
-export default function FloatingNavigation({ departments, selectedIndex, onSelect }: FloatingNavigationProps) {
+export default function FloatingNavigation({
+  departments,
+  selectedIndex,
+  onSelect,
+  placement = 'top-right',
+}: FloatingNavigationProps) {
+  const isMobile = useIsMobile();
+  const reduceMotion = useReducedMotionLike();
+  const liteMode = isMobile || reduceMotion;
+
+  const wrapperClassName =
+    placement === 'below-anchor'
+      ? 'absolute left-0 top-full mt-4 z-40 max-h-[90vh] overflow-hidden'
+      : 'fixed top-16 right-16 z-40 max-h-[90vh] overflow-hidden';
+
+  const motionProps =
+    placement === 'below-anchor'
+      ? {
+          initial: { y: -10, opacity: 0, scale: 0.985 },
+          animate: { y: 0, opacity: 1, scale: 1 },
+          exit: { y: -10, opacity: 0, scale: 0.985 },
+          transition: { duration: 0.35, type: 'spring' as const, damping: 26 },
+        }
+      : {
+          initial: { x: 150, opacity: 0 },
+          animate: { x: 0, opacity: 1 },
+          exit: { x: 150, opacity: 0 },
+          transition: { duration: 0.6, type: 'spring' as const, damping: 25 },
+        };
+
   return (
     <motion.div
-      className="fixed top-16 right-16 z-40 max-h-[90vh] overflow-hidden"
-      initial={{ x: 150, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: 150, opacity: 0 }}
-      transition={{ duration: 0.6, type: 'spring', damping: 25 }}
+      className={wrapperClassName}
+      initial={motionProps.initial}
+      animate={motionProps.animate}
+      exit={motionProps.exit}
+      transition={motionProps.transition}
     >
       {/* Elegant glass panel container */}
       <div className="relative">
@@ -29,20 +61,26 @@ export default function FloatingNavigation({ departments, selectedIndex, onSelec
           style={{
             background:
               'radial-gradient(circle at top right, rgba(251, 191, 36, 0.2), rgba(139, 92, 246, 0.15), transparent)',
-            filter: 'blur(50px)',
+            filter: liteMode ? 'none' : 'blur(50px)',
             transform: 'scale(1.15)',
           }}
         />
 
         {/* Main navigation panel */}
         <div
-          className="relative px-8 py-7 rounded-[32px] backdrop-blur-2xl overflow-hidden"
+          className={
+            liteMode
+              ? 'relative px-8 py-7 rounded-[32px] overflow-hidden'
+              : 'relative px-8 py-7 rounded-[32px] backdrop-blur-2xl overflow-hidden'
+          }
           style={{
             background:
               'linear-gradient(145deg, rgba(15, 23, 42, 0.9), rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.95))',
             border: '2px solid rgba(255, 255, 255, 0.2)',
             boxShadow:
-              '0 30px 80px rgba(0, 0, 0, 0.7), inset 0 2px 0 rgba(255, 255, 255, 0.2), inset 0 -2px 0 rgba(0, 0, 0, 0.4)',
+              liteMode
+                ? '0 18px 50px rgba(0, 0, 0, 0.6)'
+                : '0 30px 80px rgba(0, 0, 0, 0.7), inset 0 2px 0 rgba(255, 255, 255, 0.2), inset 0 -2px 0 rgba(0, 0, 0, 0.4)',
             width: '420px',
             maxHeight: '90vh',
           }}
@@ -53,7 +91,7 @@ export default function FloatingNavigation({ departments, selectedIndex, onSelec
           {/* Header */}
           <div className="mb-7 pb-5 border-b-2 border-white/15">
             <div
-              className="text-white/95 text-center mb-3"
+              className="text-white text-center mb-3"
               style={{
                 direction: 'rtl',
                 fontFamily: 'system-ui, -apple-system, sans-serif',
@@ -66,7 +104,7 @@ export default function FloatingNavigation({ departments, selectedIndex, onSelec
               وزارة النقل والاتصالات وتقنية المعلومات
             </div>
             <div
-              className="text-white/60 text-center"
+              className="text-white text-center"
               style={{
                 fontFamily: 'system-ui, -apple-system, sans-serif',
                 fontWeight: 300,
@@ -127,7 +165,7 @@ export default function FloatingNavigation({ departments, selectedIndex, onSelec
                   <div className="text-white text-lg mb-2" style={{ fontWeight: 500 }}>
                     مكتب الوزير
                   </div>
-                  <div className="text-white/60" style={{ fontWeight: 300, fontSize: '15px' }}>
+                  <div className="text-white" style={{ fontWeight: 300, fontSize: '15px' }}>
                     Minister&apos;s Office
                   </div>
                 </div>
@@ -137,7 +175,7 @@ export default function FloatingNavigation({ departments, selectedIndex, onSelec
 
             <div className="flex items-center gap-4 py-3">
               <div className="flex-1 h-[2px] bg-gradient-to-r from-transparent via-white/25 to-transparent" />
-              <div className="text-white/50 text-sm" style={{ fontWeight: 300, letterSpacing: '2px' }}>
+              <div className="text-white text-sm" style={{ fontWeight: 300, letterSpacing: '2px' }}>
                 الدوائر
               </div>
               <div className="flex-1 h-[2px] bg-gradient-to-l from-transparent via-white/25 to-transparent" />
@@ -189,10 +227,10 @@ export default function FloatingNavigation({ departments, selectedIndex, onSelec
 
                 <div className="relative flex items-center justify-between">
                   <div className="text-right flex-1 pr-4">
-                    <div className="text-white/95 mb-1.5" style={{ fontWeight: 400, fontSize: '17px' }}>
+                    <div className="text-white mb-1.5" style={{ fontWeight: 400, fontSize: '17px' }}>
                       {dept.nameAr}
                     </div>
-                    <div className="text-white/50" style={{ fontWeight: 300, fontSize: '13px' }}>
+                    <div className="text-white" style={{ fontWeight: 300, fontSize: '13px' }}>
                       {dept.nameEn}
                     </div>
                   </div>
