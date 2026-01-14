@@ -441,7 +441,7 @@ export default function App() {
           style={{ transition: 'transform 150ms ease-out' }}
         >
           <div
-            className="relative rounded-xl border border-white/12 bg-white/4 px-1 py-0.5 logo-flash"
+            className="relative rounded-2xl border border-white/12 bg-white/4 px-1.5 py-1 logo-flash"
             style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.35)' }}
           >
           {/* Minimalist: remove extra glow layer */}
@@ -449,9 +449,8 @@ export default function App() {
           <img
             src={ministryLogo}
             alt="Ministry Logo"
-            className="relative h-auto"
+            className="relative w-[22px] h-auto"
             style={{
-              width: 32,
               filter: liteMode ? 'none' : 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.18))',
             }}
           />

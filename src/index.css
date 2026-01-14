@@ -1831,7 +1831,7 @@
   content: "";
   position: absolute;
   inset: 0;
-  border-radius: inherit;
+  border-radius: 16px;
   pointer-events: none;
   background: radial-gradient(220px 120px at 50% 10%, rgba(255, 255, 255, 0.18), transparent 55%);
   animation: logoFlashSheen 2.8s ease-in-out infinite;
