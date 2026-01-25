@@ -1900,6 +1900,14 @@
   --ui-top: clamp(72px, 8vh, 120px);
   --ui-bottom: clamp(80px, 8vh, 140px);
 
+  /* Kiosk UI placement knobs */
+  --kiosk-speaker-top: 24px;
+  --kiosk-speaker-right: 24px;
+  --kiosk-logo-top: 24px;
+  --kiosk-logo-width: 750px;
+  --intro-logo-width: 520px;
+  --intro-start-align: center;
+
   /* Typography
      Note: These reference OS-installed fonts. If you want guaranteed rendering on all devices,
      add licensed webfont files and a matching @font-face. */
@@ -1958,6 +1966,51 @@ body {
   width: 100%;
   height: 100%;
   overflow: hidden;
+}
+
+/* Portal root for fixed UI that must NOT inherit any app/root scaling transforms. */
+#kiosk-ui {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  pointer-events: none; /* overlay itself doesn't steal taps/clicks */
+}
+
+/* Anything inside can opt back into interaction. */
+#kiosk-ui .kiosk-fixed-ui {
+  pointer-events: auto;
+}
+
+/*
+  Kiosk note:
+  If you apply a global transform scale() to the main app/root (common on kiosk/MagicMirror setups),
+  render critical UI (like the logo) outside that transformed subtree.
+  `App.tsx` mounts the logo/nav into `document.body` via a React portal and anchors it here.
+*/
+.kiosk-fixed-ui {
+  /* Don't use paint containment here: it can clip the navigation panel. */
+  contain: layout;
+  backface-visibility: hidden;
+}
+
+/* Fixed UI positions (safe-area aware) */
+.kiosk-speaker-controls {
+  position: fixed;
+  top: calc(var(--kiosk-speaker-top, 24px) + env(safe-area-inset-top, 0px));
+  right: calc(var(--kiosk-speaker-right, 24px) + env(safe-area-inset-right, 0px));
+  z-index: 10002;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.kiosk-logo-controls {
+  position: fixed;
+  top: calc(var(--kiosk-logo-top, 24px) + env(safe-area-inset-top, 0px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  width: fit-content;
 }
 
 /* Remove non-functional animations (kiosk-friendly). */
@@ -2023,4 +2076,485 @@ html.no-anim .logo-flash::after {
 
 html.no-anim .logo-press {
   transition: transform 150ms ease-out !important;
+}
+
+/* Intro overlay (11s cinematic). */
+.intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  isolation: isolate;
+  background:
+    radial-gradient(60% 55% at 50% 40%, rgba(255, 255, 255, 0.10) 0%, rgba(0, 0, 0, 0.90) 70%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.96) 100%);
+}
+
+/* Star / nebula layers (rendered above background, under panel). */
+.intro-overlay::before,
+.intro-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.intro-motifs {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.intro-motif {
+  position: absolute;
+  width: 220px;
+  height: 220px;
+  opacity: 0.35;
+  filter: blur(14px) saturate(120%);
+  background: radial-gradient(circle at 30% 30%, var(--intro-motif-c1, rgba(255,255,255,0.25)) 0%, var(--intro-motif-c2, rgba(255,255,255,0.10)) 45%, transparent 72%);
+  transform: translate3d(0, 0, 0);
+  will-change: transform, opacity;
+}
+
+/* Positions/sizes: tuned to feel like “planet echoes” behind the intro panel. */
+.intro-motif:nth-child(1) { width: 260px; height: 260px; top: 14%; left: 8%; }
+.intro-motif:nth-child(2) { width: 210px; height: 210px; top: 22%; right: 10%; }
+.intro-motif:nth-child(3) { width: 340px; height: 340px; bottom: 10%; left: 18%; }
+.intro-motif:nth-child(4) { width: 240px; height: 240px; bottom: 14%; right: 14%; }
+.intro-motif:nth-child(5) { width: 180px; height: 180px; top: 48%; left: 62%; }
+.intro-motif:nth-child(6) { width: 200px; height: 200px; top: 58%; left: 22%; }
+
+/* Planet-like shapes influenced by department planet types. */
+.intro-motif--legal {
+  filter: blur(12px) saturate(135%);
+  border-radius: 24px;
+  transform: rotate(45deg);
+}
+
+.intro-motif--media {
+  filter: blur(12px) saturate(140%);
+  clip-path: polygon(25% 6%, 75% 6%, 100% 50%, 75% 94%, 25% 94%, 0% 50%);
+}
+
+.intro-motif--archive,
+.intro-motif--cyber {
+  background: transparent;
+  border-radius: 999px;
+  border: 2px solid var(--intro-motif-ring, rgba(255,255,255,0.25));
+  box-shadow: 0 0 60px var(--intro-motif-c2, rgba(255,255,255,0.10));
+  filter: blur(0.2px) saturate(130%);
+  opacity: 0.25;
+}
+
+.intro-overlay--playing .intro-motif:nth-child(1) { animation: introMotifA 11s ease-in-out 1 both; }
+.intro-overlay--playing .intro-motif:nth-child(2) { animation: introMotifB 11s ease-in-out 1 both; }
+.intro-overlay--playing .intro-motif:nth-child(3) { animation: introMotifC 11s ease-in-out 1 both; }
+.intro-overlay--playing .intro-motif:nth-child(4) { animation: introMotifD 11s ease-in-out 1 both; }
+.intro-overlay--playing .intro-motif:nth-child(5) { animation: introMotifE 11s ease-in-out 1 both; }
+.intro-overlay--playing .intro-motif:nth-child(6) { animation: introMotifF 11s ease-in-out 1 both; }
+
+.intro-skip-corner {
+  position: absolute;
+  top: calc(14px + env(safe-area-inset-top, 0px));
+  right: calc(14px + env(safe-area-inset-right, 0px));
+  z-index: 3;
+  padding: 8px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.22);
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  transition: transform 160ms ease, background 160ms ease;
+}
+
+.intro-skip-corner:hover {
+  background: rgba(0, 0, 0, 0.30);
+}
+
+.intro-skip-corner:active {
+  transform: scale(0.98);
+}
+
+.intro-overlay::before {
+  opacity: 0.55;
+  background:
+    radial-gradient(circle at 18% 22%, rgba(255, 255, 255, 0.22) 0 1px, transparent 2px),
+    radial-gradient(circle at 72% 38%, rgba(255, 255, 255, 0.18) 0 1px, transparent 2px),
+    radial-gradient(circle at 42% 68%, rgba(255, 255, 255, 0.14) 0 1px, transparent 2px),
+    radial-gradient(circle at 86% 74%, rgba(255, 255, 255, 0.10) 0 1px, transparent 2px),
+    radial-gradient(circle at 10% 80%, rgba(255, 255, 255, 0.12) 0 1px, transparent 2px);
+  filter: blur(0.2px);
+  transform: translate3d(0, 0, 0);
+}
+
+.intro-overlay::after {
+  opacity: 0.65;
+  background:
+    radial-gradient(70% 60% at 20% 30%, rgba(110, 90, 255, 0.18) 0%, transparent 60%),
+    radial-gradient(65% 55% at 80% 35%, rgba(80, 200, 255, 0.14) 0%, transparent 62%),
+    radial-gradient(80% 70% at 55% 80%, rgba(255, 130, 190, 0.10) 0%, transparent 64%);
+  filter: blur(22px);
+  transform: translate3d(0, 0, 0);
+}
+
+.intro-panel {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  padding: 32px 40px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.04);
+  backdrop-filter: blur(16px);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Subtle 11s “cinematic” motion choreography. */
+.intro-overlay--playing::before {
+  animation: introStarsDrift 11s linear 1 both;
+  will-change: transform, opacity;
+}
+
+.intro-overlay--playing::after {
+  animation: introNebulaDrift 11s ease-in-out 1 both;
+  will-change: transform, opacity;
+}
+
+.intro-panel--playing {
+  animation: introPanelIn 11s cubic-bezier(0.2, 0.9, 0.2, 1) 1 both;
+  will-change: transform, opacity;
+}
+
+.intro-panel::after {
+  content: '';
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 14px;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  transform-origin: 0% 50%;
+  opacity: 0;
+}
+
+.intro-panel--playing::after {
+  opacity: 1;
+  animation: introProgress 11s cubic-bezier(0.2, 0.9, 0.2, 1) 1 both;
+  will-change: transform, opacity;
+}
+
+.intro-logo {
+  display: inline-block;
+  opacity: 0.98;
+  transform: translateZ(0);
+}
+
+.intro-logo--playing {
+  animation: introLogo 11s cubic-bezier(0.2, 0.9, 0.2, 1) 1 both;
+  will-change: transform, opacity;
+}
+
+.intro-title {
+  margin-top: 18px;
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 28px;
+  font-weight: 300;
+  letter-spacing: 0.04em;
+}
+
+.intro-panel--playing .intro-title {
+  animation: introTitleReveal 11s cubic-bezier(0.2, 0.9, 0.2, 1) 1 both;
+  will-change: transform, opacity, filter;
+}
+
+.intro-sub {
+  margin-top: 10px;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.intro-sound-hint {
+  margin-top: 14px;
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(0, 0, 0, 0.22);
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 11px;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+}
+
+.intro-panel--playing .intro-sub {
+  animation: introSubReveal 11s cubic-bezier(0.2, 0.9, 0.2, 1) 1 both;
+  will-change: transform, opacity;
+}
+
+.intro-start {
+  margin-top: 22px;
+  min-height: 80px;
+  padding: 0 44px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.92);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 16px;
+  font-weight: 500;
+  transition: transform 160ms ease, background 160ms ease;
+  align-self: var(--intro-start-align, center);
+}
+
+.intro-start--ready {
+  animation: introStartPulse 1.3s ease-in-out infinite;
+}
+
+.intro-actions {
+  margin-top: 22px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.intro-actions .intro-start {
+  margin-top: 0;
+}
+
+.intro-skip {
+  padding: 12px 18px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.18);
+  color: rgba(255, 255, 255, 0.80);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  transition: transform 160ms ease, background 160ms ease;
+}
+
+.intro-skip:hover {
+  background: rgba(0, 0, 0, 0.26);
+}
+
+.intro-skip:active {
+  transform: scale(0.98);
+}
+
+.intro-start:hover {
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.intro-start:active {
+  transform: scale(0.98);
+}
+
+@keyframes introLogo {
+  0% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+    filter: blur(2px);
+  }
+  12% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(0) scale(1.03);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1.04);
+  }
+}
+
+@keyframes introStarsDrift {
+  0% {
+    opacity: 0.05;
+    transform: translate3d(0, 10px, 0) scale(1.0);
+  }
+  12% {
+    opacity: 0.55;
+  }
+  100% {
+    opacity: 0.60;
+    transform: translate3d(0, -16px, 0) scale(1.02);
+  }
+}
+
+@keyframes introNebulaDrift {
+  0% {
+    opacity: 0.0;
+    transform: translate3d(0, 18px, 0) scale(1.02);
+  }
+  18% {
+    opacity: 0.72;
+  }
+  70% {
+    opacity: 0.60;
+    transform: translate3d(0, -10px, 0) scale(1.06);
+  }
+  100% {
+    opacity: 0.55;
+    transform: translate3d(0, -14px, 0) scale(1.07);
+  }
+}
+
+@keyframes introPanelIn {
+  0% {
+    opacity: 0.0;
+    transform: translateY(12px) scale(0.985);
+    filter: blur(2px);
+  }
+  10% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    filter: blur(0);
+  }
+  80% {
+    opacity: 1;
+    transform: translateY(0) scale(1.01);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1.015);
+  }
+}
+
+@keyframes introTitleReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+    filter: blur(2px);
+  }
+  18% {
+    opacity: 0;
+    transform: translateY(8px);
+    filter: blur(2px);
+  }
+  28% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes introSubReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  28% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  38% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes introProgress {
+  0% {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  8% {
+    opacity: 0.75;
+    transform: scaleX(0.06);
+  }
+  100% {
+    opacity: 0.9;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes introMotifA {
+  0% { opacity: 0.05; transform: translate3d(-10px, 12px, 0) scale(0.96); }
+  18% { opacity: 0.35; }
+  100% { opacity: 0.40; transform: translate3d(22px, -14px, 0) scale(1.04); }
+}
+
+@keyframes introMotifB {
+  0% { opacity: 0.03; transform: translate3d(8px, 10px, 0) scale(0.95); }
+  22% { opacity: 0.34; }
+  100% { opacity: 0.38; transform: translate3d(-24px, -18px, 0) scale(1.05); }
+}
+
+@keyframes introMotifC {
+  0% { opacity: 0.02; transform: translate3d(-12px, 10px, 0) scale(0.98); }
+  18% { opacity: 0.30; }
+  70% { opacity: 0.28; transform: translate3d(18px, -8px, 0) scale(1.03); }
+  100% { opacity: 0.26; transform: translate3d(26px, -12px, 0) scale(1.05); }
+}
+
+@keyframes introMotifD {
+  0% { opacity: 0.02; transform: translate3d(10px, 16px, 0) scale(0.98); }
+  22% { opacity: 0.28; }
+  100% { opacity: 0.30; transform: translate3d(-18px, -20px, 0) scale(1.04); }
+}
+
+@keyframes introMotifE {
+  0% { opacity: 0.02; transform: translate3d(0, 10px, 0) scale(0.96) rotate(0deg); }
+  28% { opacity: 0.26; }
+  100% { opacity: 0.30; transform: translate3d(-10px, -22px, 0) scale(1.05) rotate(10deg); }
+}
+
+@keyframes introMotifF {
+  0% { opacity: 0.02; transform: translate3d(0, 14px, 0) scale(0.97); }
+  26% { opacity: 0.26; }
+  100% { opacity: 0.30; transform: translate3d(14px, -18px, 0) scale(1.05); }
+}
+
+@keyframes introStartPulse {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-1px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-overlay--playing .intro-motif {
+    animation: none;
+  }
+  .intro-overlay::before,
+  .intro-overlay::after,
+  .intro-panel--playing,
+  .intro-panel--playing::after,
+  .intro-panel--playing .intro-title,
+  .intro-panel--playing .intro-sub {
+    animation: none;
+  }
+  .intro-logo--playing {
+    animation: none;
+  }
+  .intro-start,
+  .intro-start--ready {
+    animation: none;
+  }
 }

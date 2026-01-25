@@ -11,7 +11,7 @@ interface FloatingNavigationProps {
   departments: Department[];
   selectedIndex: number | null;
   onSelect: (index: number) => void;
-  placement?: 'top-right' | 'below-anchor' | 'right-side';
+  placement?: 'top-right' | 'below-anchor' | 'right-side' | 'center';
 }
 
 export default function FloatingNavigation({
@@ -27,10 +27,12 @@ export default function FloatingNavigation({
 
   const wrapperClassName =
     placement === 'below-anchor'
-      ? 'absolute left-1/2 top-full -translate-x-1/2 mt-4 z-40 max-h-[90vh] overflow-hidden'
+      ? 'absolute left-1/2 top-full -translate-x-1/2 mt-4 z-[10000] max-h-[90vh] overflow-hidden'
+      : placement === 'center'
+        ? 'fixed top-24 left-1/2 -translate-x-1/2 z-[10000] max-h-[90vh] overflow-hidden'
       : placement === 'right-side'
-        ? 'fixed top-24 right-6 z-40 max-h-[90vh] overflow-hidden'
-        : 'fixed top-16 right-16 z-40 max-h-[90vh] overflow-hidden';
+        ? 'fixed top-24 right-6 z-[10000] max-h-[90vh] overflow-hidden'
+        : 'fixed top-16 right-16 z-[10000] max-h-[90vh] overflow-hidden';
 
   return (
     <div className={wrapperClassName}>

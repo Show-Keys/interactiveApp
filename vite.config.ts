@@ -18,7 +18,13 @@
       outDir: 'build',
     },
     server: {
+      host: true,
       port: 3000,
+      strictPort: true,
+      hmr: {
+        host: '10.0.2.2',
+        port: 3000,
+      },
       open: true,
     },
   });

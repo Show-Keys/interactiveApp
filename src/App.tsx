@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import CinematicBackground from './components/CinematicBackground';
 import MinisterSun from './components/MinisterSun';
 import UniquePlanet from './components/UniquePlanet';
@@ -6,6 +7,8 @@ import OrbitingBadge from './components/OrbitingBadge';
 import FloatingNavigation from './components/FloatingNavigation';
 import InfoPanel from './components/InfoPanel';
 import { usePrefersReducedMotion, useReducedMotionLike } from './components/ui/use-reduced-motion';
+import { createSfxPlayer } from './utils/sfx';
+import { createLoopingMusicPlayer } from './utils/music';
 import ministryLogo from 'figma:asset/e9f3f4cb580b0827ed78bb6ecbe12efcb70b7930.png';
 
 interface DepartmentData {
@@ -271,8 +274,159 @@ export default function App() {
   const [selectedPlanet, setSelectedPlanet] = useState<number | null>(null);
   const [isPanelOpen, setIsPanelOpen] = useState(false);
   const [zoomedPlanet, setZoomedPlanet] = useState<number | null>(null);
-  const [showWelcome, setShowWelcome] = useState(true);
+  const [showIntro, setShowIntro] = useState(true);
+  const [introPhase, setIntroPhase] = useState<'locked' | 'playing'>('locked');
   const [isNavOpen, setIsNavOpen] = useState(false);
+  const [musicEnabled, setMusicEnabled] = useState(() => {
+    try {
+      const stored = localStorage.getItem('musicEnabled');
+      return stored === null ? true : stored === 'true';
+    } catch {
+      return true;
+    }
+  });
+
+  const sfx = useMemo(() => createSfxPlayer({ volume: 0.35 }), []);
+  const music = useMemo(
+    () => createLoopingMusicPlayer({ src: '/sfx/space-chords-loop.mp3', volume: 0.18 }),
+    [],
+  );
+  const introAudio = useMemo(() => {
+    const audio = new Audio('/sfx/cinematic-intro.mp3');
+    audio.preload = 'auto';
+    audio.loop = false;
+    audio.volume = 0.95;
+    // Helps on iOS/WebView; harmless elsewhere.
+    (audio as unknown as { playsInline?: boolean }).playsInline = true;
+    return audio;
+  }, []);
+
+  const introMotifs = useMemo(() => {
+    const picks = [0, 1, 2, 3, 7, 12];
+    return picks
+      .filter((i) => i >= 0 && i < departments.length)
+      .map((i) => {
+        const d = departments[i];
+        return {
+          key: `${d.planetType}-${i}`,
+          planetType: d.planetType,
+          color: d.color,
+          secondaryColor: d.secondaryColor ?? d.color,
+          size: d.size,
+        };
+      });
+  }, []);
+
+  const withHexAlpha = (hex: string, alpha: string) => {
+    if (/^#[0-9a-fA-F]{6}$/.test(hex)) return `${hex}${alpha}`;
+    if (/^#[0-9a-fA-F]{3}$/.test(hex)) {
+      const r = hex[1];
+      const g = hex[2];
+      const b = hex[3];
+      return `#${r}${r}${g}${g}${b}${b}${alpha}`;
+    }
+    return hex;
+  };
+
+  const introTimerRef = useRef<number | null>(null);
+
+  const clearIntroTimer = () => {
+    if (introTimerRef.current) {
+      window.clearTimeout(introTimerRef.current);
+      introTimerRef.current = null;
+    }
+  };
+
+  const beginIntro = () => {
+    if (introPhase === 'playing') return;
+
+    clearIntroTimer();
+    setIntroPhase('playing');
+
+    try {
+      introAudio.currentTime = 0;
+    } catch {
+      // ignore
+    }
+
+    // Start audio once (this function is called via Start button user gesture).
+    try {
+      introAudio.muted = false;
+      introAudio.volume = 0.95;
+    } catch {
+      // ignore
+    }
+
+    if (introAudio.paused) {
+      void introAudio.play().catch(() => {
+        // Autoplay restrictions or missing file.
+      });
+    }
+
+    // Auto-dismiss after ~11 seconds and start the app.
+    introTimerRef.current = window.setTimeout(() => {
+      introTimerRef.current = null;
+      startApp();
+    }, 11000);
+  };
+
+  const startApp = () => {
+    clearIntroTimer();
+    try {
+      introAudio.pause();
+      introAudio.currentTime = 0;
+    } catch {
+      // ignore
+    }
+
+    setShowIntro(false);
+    setIsNavOpen(false);
+  };
+
+  const replayIntro = () => {
+    clearIntroTimer();
+    try {
+      introAudio.pause();
+      introAudio.currentTime = 0;
+    } catch {
+      // ignore
+    }
+
+    setIntroPhase('locked');
+    setShowIntro(true);
+    setIsNavOpen(false);
+  };
+
+  useEffect(() => {
+    sfx.preload();
+  }, [sfx]);
+
+  useEffect(() => {
+    const appStarted = !showIntro;
+
+    music.setEnabled(appStarted && musicEnabled);
+    try {
+      localStorage.setItem('musicEnabled', String(musicEnabled));
+    } catch {
+      // ignore
+    }
+
+    // Starting may be blocked by autoplay policy; we also call ensureStarted()
+    // on user taps when music is enabled.
+    if (appStarted && musicEnabled) void music.ensureStarted();
+  }, [music, musicEnabled, showIntro]);
+
+  useEffect(() => {
+    const onEnded = () => {
+      // Timer controls transition to app.
+    };
+
+    introAudio.addEventListener('ended', onEnded);
+    return () => {
+      introAudio.removeEventListener('ended', onEnded);
+      clearIntroTimer();
+    };
+  }, [introAudio]);
 
   const [viewport, setViewport] = useState(() => {
     const vv = window.visualViewport;
@@ -352,12 +506,6 @@ export default function App() {
   // Animations removed for kiosk performance.
 
   useEffect(() => {
-    const timeoutMs = prefersReducedMotion ? 800 : 1800;
-    const t = window.setTimeout(() => setShowWelcome(false), timeoutMs);
-    return () => window.clearTimeout(t);
-  }, [prefersReducedMotion]);
-
-  useEffect(() => {
     let raf = 0;
     const update = () => {
       if (raf) return;
@@ -387,12 +535,15 @@ export default function App() {
   }, []);
 
   const handlePlanetClick = (index: number) => {
+    void sfx.play('open');
+    setIsNavOpen(false);
     setSelectedPlanet(index);
     setZoomedPlanet(index);
     setIsPanelOpen(true);
   };
 
   const handleNavSelect = (index: number) => {
+    void sfx.play('select');
     if (index === -1) {
       // Minister's office selected
       setSelectedPlanet(null);
@@ -404,71 +555,239 @@ export default function App() {
   };
 
   const handleClosePanel = () => {
+    void sfx.play('close');
     setIsPanelOpen(false);
     setZoomedPlanet(null);
     setTimeout(() => setSelectedPlanet(null), 300);
   };
+
+  const kioskTarget =
+    typeof document !== 'undefined'
+      ? (document.getElementById('kiosk-ui') ?? document.body)
+      : null;
+
+  const hideLogoUi = showIntro || selectedPlanet !== null;
 
   return (
     <div
       className="fixed inset-0 overflow-hidden"
       style={{ background: '#000000' }}
     >
-      {showWelcome && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/85"
-          onClick={() => setShowWelcome(false)}
-        >
-          <div
-            dir="rtl"
-            className="text-center px-10 py-8 rounded-2xl border border-white/10 bg-white/5"
-          >
-            <div className="text-white text-3xl font-light tracking-wide">مرحبا بكم في البرنامج التفاعلي</div>
-            <div className="text-white/60 text-sm mt-3 font-extralight tracking-widest">TAP TO START</div>
-          </div>
-        </div>
-      )}
+      {kioskTarget
+        ? createPortal(
+            <>
+              {showIntro && (
+                <div
+                  className={`kiosk-fixed-ui intro-overlay${introPhase === 'playing' ? ' intro-overlay--playing' : ''}`}
+                  onClick={() => {
+                    // Start is the only action.
+                  }}
+                >
+                  <div className="intro-motifs" aria-hidden="true">
+                    {introMotifs.map((m) => (
+                      <div
+                        key={m.key}
+                        className={`intro-motif intro-motif--${m.planetType}`}
+                        style={
+                          {
+                            ['--intro-motif-c1' as unknown as string]: withHexAlpha(m.color, 'cc'),
+                            ['--intro-motif-c2' as unknown as string]: withHexAlpha(m.secondaryColor, '66'),
+                            ['--intro-motif-ring' as unknown as string]: withHexAlpha(m.color, '80'),
+                          } as React.CSSProperties
+                        }
+                      />
+                    ))}
+                  </div>
+
+                  <div className={introPhase === 'playing' ? 'intro-panel intro-panel--playing' : 'intro-panel'}>
+                    <div className={introPhase === 'playing' ? 'intro-logo intro-logo--playing' : 'intro-logo'}>
+                      <img src={ministryLogo} alt="Ministry Logo" style={{ width: 'var(--intro-logo-width, 520px)' }} />
+                    </div>
+
+                    <div dir="rtl" className="intro-title">البرنامج التعريفي التفاعلي</div>
+                    <div className="intro-sub">
+                      {introPhase === 'playing' ? 'Intro playing' : 'Ready'}
+                    </div>
+
+                    {introPhase === 'locked' && (
+                      <button
+                        type="button"
+                        className="intro-start"
+                        onClick={() => {
+                          void sfx.play('tap');
+                          beginIntro();
+                        }}
+                      >
+                        Start
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {!showIntro && (
+                <div className="kiosk-fixed-ui kiosk-speaker-controls">
+                  <button
+                    type="button"
+                    className="inline-flex h-[64px] w-[64px] items-center justify-center rounded-full border border-white/12 bg-black/25 text-white/85 backdrop-blur hover:bg-black/35 active:bg-black/45"
+                    aria-label="Replay intro"
+                    onClick={() => {
+                      void sfx.play('tap');
+                      replayIntro();
+                    }}
+                  >
+                    <svg
+                      width="80"
+                      height="80"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                      aria-hidden="true"
+                    >
+                      <path
+                        d="M21 12a9 9 0 1 1-3.2-6.9"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                      />
+                      <path
+                        d="M21 5v5h-5"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      />
+                    </svg>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="inline-flex h-[64px] w-[64px] items-center justify-center rounded-full border border-white/12 bg-black/25 text-white/85 backdrop-blur hover:bg-black/35 active:bg-black/45"
+                    aria-label={musicEnabled ? 'Mute background music' : 'Unmute background music'}
+                    onClick={() => {
+                      void sfx.play('tap');
+                      setMusicEnabled((v) => {
+                        const next = !v;
+                        if (next) void music.ensureStarted();
+                        return next;
+                      });
+                    }}
+                  >
+                    {musicEnabled ? (
+                      <svg
+                        width="80"
+                        height="80"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M4 10v4h4l5 4V6L8 10H4Z"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M16.5 9.5c.9.9.9 4.1 0 5"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                        />
+                        <path
+                          d="M19 7c2 2 2 8 0 10"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    ) : (
+                      <svg
+                        width="80"
+                        height="80"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        xmlns="http://www.w3.org/2000/svg"
+                        aria-hidden="true"
+                      >
+                        <path
+                          d="M4 10v4h4l5 4V6L8 10H4Z"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinejoin="round"
+                        />
+                        <path
+                          d="M16 9l4 6"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                        />
+                        <path
+                          d="M20 9l-4 6"
+                          stroke="currentColor"
+                          strokeWidth="1.8"
+                          strokeLinecap="round"
+                        />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+              )}
+
+              <div className="kiosk-fixed-ui kiosk-logo-controls">
+                {!hideLogoUi && (
+                  <>
+                    <button
+                      className={`bg-transparent border-0 p-0 cursor-pointer logo-press transition-opacity duration-200 ${
+                        isNavOpen ? 'opacity-50' : 'opacity-100'
+                      }`}
+                      onClick={() => {
+                        void sfx.play('tap');
+                        if (!showIntro && musicEnabled) void music.ensureStarted();
+                        setIsNavOpen((v) => !v);
+                      }}
+                      aria-label="Toggle navigation"
+                      type="button"
+                    >
+                      <div
+                        className="relative rounded-2xl border border-white/12 bg-white/4 px-3 py-2 logo-flash"
+                        style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.35)' }}
+                      >
+                        <img
+                          src={ministryLogo}
+                          alt="Ministry Logo"
+                          className="block h-auto"
+                          style={{
+                            width: 'var(--kiosk-logo-width, 750px)',
+                            filter: liteMode ? 'none' : 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.18))',
+                          }}
+                        />
+                      </div>
+                    </button>
+
+                    {isNavOpen && (
+                      <div className="relative z-[10000]">
+                        <FloatingNavigation
+                          placement="center"
+                          departments={departments}
+                          selectedIndex={selectedPlanet}
+                          onSelect={(idx) => {
+                            handleNavSelect(idx);
+                            setIsNavOpen(false);
+                          }}
+                        />
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </>,
+            kioskTarget,
+          )
+        : null}
 
       {/* Cinematic background */}
       <CinematicBackground />
-
-      {/* Ministry logo + Navigation */}
-      <div className="absolute top-6 left-1/2 -translate-x-1/2 z-50 relative w-fit">
-        <button
-          className="bg-transparent border-0 p-0 cursor-pointer logo-press"
-          onClick={() => setIsNavOpen((v) => !v)}
-          aria-label="Toggle navigation"
-          style={{ transition: 'transform 150ms ease-out' }}
-        >
-          <div
-            className="relative rounded-2xl border border-white/12 bg-white/4 px-1.5 py-1 logo-flash"
-            style={{ boxShadow: '0 10px 30px rgba(0,0,0,0.35)' }}
-          >
-          {/* Minimalist: remove extra glow layer */}
-
-          <img
-            src={ministryLogo}
-            alt="Ministry Logo"
-            className="relative w-[22px] h-auto"
-            style={{
-              filter: liteMode ? 'none' : 'drop-shadow(0 0 10px rgba(255, 255, 255, 0.18))',
-            }}
-          />
-          </div>
-        </button>
-
-        {isNavOpen && (
-          <FloatingNavigation
-            placement="right-side"
-            departments={departments}
-            selectedIndex={selectedPlanet}
-            onSelect={(idx) => {
-              handleNavSelect(idx);
-              setIsNavOpen(false);
-            }}
-          />
-        )}
-      </div>
 
       {/* Solar system container */}
       <div
