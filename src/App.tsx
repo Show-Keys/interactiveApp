@@ -10,6 +10,8 @@ import { usePrefersReducedMotion, useReducedMotionLike } from './components/ui/u
 import { createSfxPlayer } from './utils/sfx';
 import { createLoopingMusicPlayer } from './utils/music';
 import ministryLogo from 'figma:asset/e9f3f4cb580b0827ed78bb6ecbe12efcb70b7930.png';
+import introVideoSrc from './assets/pics and vids/Oman 2040_ The Epic 38s Power Intro.mp4';
+import introPosterSrc from './assets/pics and vids/2040_image.png';
 
 interface DepartmentData {
   nameAr: string;
@@ -291,15 +293,7 @@ export default function App() {
     () => createLoopingMusicPlayer({ src: '/sfx/space-chords-loop.mp3', volume: 0.18 }),
     [],
   );
-  const introAudio = useMemo(() => {
-    const audio = new Audio('/sfx/cinematic-intro.mp3');
-    audio.preload = 'auto';
-    audio.loop = false;
-    audio.volume = 0.95;
-    // Helps on iOS/WebView; harmless elsewhere.
-    (audio as unknown as { playsInline?: boolean }).playsInline = true;
-    return audio;
-  }, []);
+  const introVideoRef = useRef<HTMLVideoElement | null>(null);
 
   const introMotifs = useMemo(() => {
     const picks = [0, 1, 2, 3, 7, 12];
@@ -330,6 +324,8 @@ export default function App() {
 
   const introTimerRef = useRef<number | null>(null);
 
+  const INTRO_DURATION_MS = 38000;
+
   const clearIntroTimer = () => {
     if (introTimerRef.current) {
       window.clearTimeout(introTimerRef.current);
@@ -343,40 +339,46 @@ export default function App() {
     clearIntroTimer();
     setIntroPhase('playing');
 
-    try {
-      introAudio.currentTime = 0;
-    } catch {
-      // ignore
-    }
+    // Play video once (called via Start button user gesture).
+    const v = introVideoRef.current;
+    let durationMs = INTRO_DURATION_MS;
+    if (v) {
+      try {
+        v.muted = false;
+        v.volume = 1;
+        v.currentTime = 0;
+      } catch {
+        // ignore
+      }
 
-    // Start audio once (this function is called via Start button user gesture).
-    try {
-      introAudio.muted = false;
-      introAudio.volume = 0.95;
-    } catch {
-      // ignore
-    }
-
-    if (introAudio.paused) {
-      void introAudio.play().catch(() => {
-        // Autoplay restrictions or missing file.
+      void v.play().catch(() => {
+        // Autoplay restrictions (should be allowed after user gesture).
       });
+
+      // Prefer the actual video duration when available, but never allow
+      // the intro to auto-dismiss earlier than the configured 38s.
+      const videoDurationMs = Number.isFinite(v.duration) ? Math.round(v.duration * 1000) : INTRO_DURATION_MS;
+      durationMs = Math.max(INTRO_DURATION_MS, videoDurationMs);
     }
 
-    // Auto-dismiss after ~11 seconds and start the app.
+    // Auto-dismiss after ~38 seconds (or longer if the video is longer).
     introTimerRef.current = window.setTimeout(() => {
       introTimerRef.current = null;
       startApp();
-    }, 11000);
+    }, durationMs);
   };
 
   const startApp = () => {
     clearIntroTimer();
-    try {
-      introAudio.pause();
-      introAudio.currentTime = 0;
-    } catch {
-      // ignore
+
+    const v = introVideoRef.current;
+    if (v) {
+      try {
+        v.pause();
+        v.currentTime = 0;
+      } catch {
+        // ignore
+      }
     }
 
     setShowIntro(false);
@@ -385,11 +387,15 @@ export default function App() {
 
   const replayIntro = () => {
     clearIntroTimer();
-    try {
-      introAudio.pause();
-      introAudio.currentTime = 0;
-    } catch {
-      // ignore
+
+    const v = introVideoRef.current;
+    if (v) {
+      try {
+        v.pause();
+        v.currentTime = 0;
+      } catch {
+        // ignore
+      }
     }
 
     setIntroPhase('locked');
@@ -417,16 +423,21 @@ export default function App() {
   }, [music, musicEnabled, showIntro]);
 
   useEffect(() => {
-    const onEnded = () => {
-      // Timer controls transition to app.
-    };
+    if (!showIntro) return;
+    const v = introVideoRef.current;
+    if (!v) return;
 
-    introAudio.addEventListener('ended', onEnded);
-    return () => {
-      introAudio.removeEventListener('ended', onEnded);
-      clearIntroTimer();
-    };
-  }, [introAudio]);
+    // Preload the video and try to show the first frame.
+    try {
+      // Keep unmuted; actual playback still requires user gesture.
+      v.muted = false;
+      v.pause();
+      v.currentTime = 0;
+      v.load();
+    } catch {
+      // ignore
+    }
+  }, [showIntro]);
 
   const [viewport, setViewport] = useState(() => {
     const vv = window.visualViewport;
@@ -583,6 +594,48 @@ export default function App() {
                     // Start is the only action.
                   }}
                 >
+                  <img
+                    className="intro-bg-poster"
+                    src={introPosterSrc}
+                    alt=""
+                    aria-hidden="true"
+                    draggable={false}
+                  />
+
+                  <div className="intro-bg-scrim" aria-hidden="true" />
+
+                  <video
+                    ref={introVideoRef}
+                    className="intro-bg-video"
+                    src={introVideoSrc}
+                    poster={introPosterSrc}
+                    playsInline
+                    preload="auto"
+                    onLoadedMetadata={(e) => {
+                      const v = e.currentTarget;
+                      if (v.videoWidth !== 1440 || v.videoHeight !== 3840) {
+                        // eslint-disable-next-line no-console
+                        console.warn(
+                          `[intro] Expected intro video 1440x3840 but got ${v.videoWidth}x${v.videoHeight}. Replace the MP4 with a 1440x3840 encode for best quality.`,
+                        );
+                      }
+                    }}
+                  />
+
+                  {introPhase === 'playing' && (
+                    <button
+                      type="button"
+                      className="intro-skip-x"
+                      aria-label="Skip intro"
+                      onClick={() => {
+                        void sfx.play('tap');
+                        startApp();
+                      }}
+                    >
+                      ×
+                    </button>
+                  )}
+
                   <div className="intro-motifs" aria-hidden="true">
                     {introMotifs.map((m) => (
                       <div

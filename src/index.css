@@ -2078,7 +2078,7 @@ html.no-anim .logo-press {
   transition: transform 150ms ease-out !important;
 }
 
-/* Intro overlay (11s cinematic). */
+/* Intro overlay (38s cinematic). */
 .intro-overlay {
   position: fixed;
   inset: 0;
@@ -2088,9 +2088,81 @@ html.no-anim .logo-press {
   justify-content: center;
   pointer-events: auto;
   isolation: isolate;
+  background: #000;
+}
+
+.intro-bg-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  pointer-events: none;
+  filter: saturate(110%) contrast(105%) brightness(0.9);
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+.intro-bg-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-drag: none;
+  opacity: 1;
+  transition: opacity 220ms ease;
+  filter: saturate(110%) contrast(105%) brightness(0.9);
+}
+
+.intro-bg-scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
   background:
-    radial-gradient(60% 55% at 50% 40%, rgba(255, 255, 255, 0.10) 0%, rgba(0, 0, 0, 0.90) 70%),
-    linear-gradient(180deg, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.96) 100%);
+    radial-gradient(65% 58% at 50% 38%, rgba(0, 0, 0, 0.10) 0%, rgba(0, 0, 0, 0.72) 70%),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.42) 0%, rgba(0, 0, 0, 0.78) 100%);
+}
+
+.intro-overlay--playing .intro-bg-video {
+  opacity: 1;
+}
+
+.intro-overlay--playing .intro-bg-poster {
+  opacity: 0;
+}
+
+.intro-skip-x {
+  position: absolute;
+  top: calc(12px + env(safe-area-inset-top, 0px));
+  right: calc(12px + env(safe-area-inset-right, 0px));
+  z-index: 4;
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.20);
+  background: rgba(220, 38, 38, 0.85);
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 32px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55);
+  transition: transform 160ms ease, background 160ms ease;
+}
+
+.intro-skip-x:hover {
+  background: rgba(239, 68, 68, 0.92);
+}
+
+.intro-skip-x:active {
+  transform: scale(0.98);
 }
 
 /* Star / nebula layers (rendered above background, under panel). */
@@ -2099,14 +2171,14 @@ html.no-anim .logo-press {
   content: '';
   position: absolute;
   inset: 0;
-  z-index: 0;
+  z-index: 2;
   pointer-events: none;
 }
 
 .intro-motifs {
   position: absolute;
   inset: 0;
-  z-index: 1;
+  z-index: 3;
   pointer-events: none;
 }
 
@@ -2151,12 +2223,12 @@ html.no-anim .logo-press {
   opacity: 0.25;
 }
 
-.intro-overlay--playing .intro-motif:nth-child(1) { animation: introMotifA 11s ease-in-out 1 both; }
-.intro-overlay--playing .intro-motif:nth-child(2) { animation: introMotifB 11s ease-in-out 1 both; }
-.intro-overlay--playing .intro-motif:nth-child(3) { animation: introMotifC 11s ease-in-out 1 both; }
-.intro-overlay--playing .intro-motif:nth-child(4) { animation: introMotifD 11s ease-in-out 1 both; }
-.intro-overlay--playing .intro-motif:nth-child(5) { animation: introMotifE 11s ease-in-out 1 both; }
-.intro-overlay--playing .intro-motif:nth-child(6) { animation: introMotifF 11s ease-in-out 1 both; }
+.intro-overlay--playing .intro-motif:nth-child(1) { animation: introMotifA 38s ease-in-out 1 both; }
+.intro-overlay--playing .intro-motif:nth-child(2) { animation: introMotifB 38s ease-in-out 1 both; }
+.intro-overlay--playing .intro-motif:nth-child(3) { animation: introMotifC 38s ease-in-out 1 both; }
+.intro-overlay--playing .intro-motif:nth-child(4) { animation: introMotifD 38s ease-in-out 1 both; }
+.intro-overlay--playing .intro-motif:nth-child(5) { animation: introMotifE 38s ease-in-out 1 both; }
+.intro-overlay--playing .intro-motif:nth-child(6) { animation: introMotifF 38s ease-in-out 1 both; }
 
 .intro-skip-corner {
   position: absolute;
@@ -2206,32 +2278,32 @@ html.no-anim .logo-press {
 
 .intro-panel {
   position: relative;
-  z-index: 2;
+  z-index: 4;
   text-align: center;
   padding: 32px 40px;
   border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.10);
   background: rgba(255, 255, 255, 0.04);
   backdrop-filter: blur(16px);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.68);
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-/* Subtle 11s “cinematic” motion choreography. */
+/* Subtle 38s “cinematic” motion choreography. */
 .intro-overlay--playing::before {
-  animation: introStarsDrift 11s linear 1 both;
+  animation: introStarsDrift 38s linear 1 both;
   will-change: transform, opacity;
 }
 
 .intro-overlay--playing::after {
-  animation: introNebulaDrift 11s ease-in-out 1 both;
+  animation: introNebulaDrift 38s ease-in-out 1 both;
   will-change: transform, opacity;
 }
 
 .intro-panel--playing {
-  animation: introPanelIn 11s cubic-bezier(0.2, 0.9, 0.2, 1) 1 both;
+  animation: introPanelIn 38s cubic-bezier(0.2, 0.9, 0.2, 1) 1 both;
   will-change: transform, opacity;
 }
 
@@ -2250,7 +2322,7 @@ html.no-anim .logo-press {
 
 .intro-panel--playing::after {
   opacity: 1;
-  animation: introProgress 11s cubic-bezier(0.2, 0.9, 0.2, 1) 1 both;
+  animation: introProgress 38s cubic-bezier(0.2, 0.9, 0.2, 1) 1 both;
   will-change: transform, opacity;
 }
 
@@ -2261,7 +2333,7 @@ html.no-anim .logo-press {
 }
 
 .intro-logo--playing {
-  animation: introLogo 11s cubic-bezier(0.2, 0.9, 0.2, 1) 1 both;
+  animation: introLogo 38s cubic-bezier(0.2, 0.9, 0.2, 1) 1 both;
   will-change: transform, opacity;
 }
 
@@ -2274,7 +2346,7 @@ html.no-anim .logo-press {
 }
 
 .intro-panel--playing .intro-title {
-  animation: introTitleReveal 11s cubic-bezier(0.2, 0.9, 0.2, 1) 1 both;
+  animation: introTitleReveal 38s cubic-bezier(0.2, 0.9, 0.2, 1) 1 both;
   will-change: transform, opacity, filter;
 }
 
@@ -2300,7 +2372,7 @@ html.no-anim .logo-press {
 }
 
 .intro-panel--playing .intro-sub {
-  animation: introSubReveal 11s cubic-bezier(0.2, 0.9, 0.2, 1) 1 both;
+  animation: introSubReveal 38s cubic-bezier(0.2, 0.9, 0.2, 1) 1 both;
   will-change: transform, opacity;
 }
 
