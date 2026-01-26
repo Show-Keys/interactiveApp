@@ -622,20 +622,6 @@ export default function App() {
                     }}
                   />
 
-                  {introPhase === 'playing' && (
-                    <button
-                      type="button"
-                      className="intro-skip-x"
-                      aria-label="Skip intro"
-                      onClick={() => {
-                        void sfx.play('tap');
-                        startApp();
-                      }}
-                    >
-                      ×
-                    </button>
-                  )}
-
                   <div className="intro-motifs" aria-hidden="true">
                     {introMotifs.map((m) => (
                       <div
@@ -659,18 +645,34 @@ export default function App() {
 
                     <div dir="rtl" className="intro-title">مجرة القيادة</div>
 
-                    {introPhase === 'locked' && (
-                      <button
-                        type="button"
-                        className="intro-start"
-                        onClick={() => {
-                          void sfx.play('tap');
-                          beginIntro();
-                        }}
-                      >
-                        Start
-                      </button>
-                    )}
+                    <div className="intro-actions">
+                      {introPhase === 'locked' && (
+                        <button
+                          type="button"
+                          className="intro-start"
+                          onClick={() => {
+                            void sfx.play('tap');
+                            beginIntro();
+                          }}
+                        >
+                          Start
+                        </button>
+                      )}
+
+                      {introPhase === 'playing' && (
+                        <button
+                          type="button"
+                          className="intro-skip intro-skip--ar"
+                          aria-label="Skip intro"
+                          onClick={() => {
+                            void sfx.play('tap');
+                            startApp();
+                          }}
+                        >
+                          تخطي
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
               )}

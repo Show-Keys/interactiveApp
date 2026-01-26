@@ -2478,6 +2478,13 @@ html.no-anim .logo-press {
   transition: transform 160ms ease, background 160ms ease;
 }
 
+.intro-skip--ar {
+  direction: rtl;
+  font-family: var(--font-ar);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 .intro-skip:hover {
   background: rgba(0, 0, 0, 0.26);
 }
