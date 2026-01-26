@@ -2,6 +2,7 @@ import * as React from 'react';
 import { X } from 'lucide-react';
 import { useIsMobile } from './ui/use-mobile';
 import { useReducedMotionLike } from './ui/use-reduced-motion';
+import { useFastTap } from '../utils/useFastTap';
 
 interface InfoPanelProps {
   isOpen: boolean;
@@ -28,6 +29,8 @@ export default function InfoPanel({
   const reduceMotion = useReducedMotionLike();
   const liteMode = isMobile || reduceMotion;
   const minimalist = true;
+
+  const closeTap = useFastTap(onClose);
 
   const [shouldRender, setShouldRender] = React.useState(isOpen);
 
@@ -57,7 +60,8 @@ export default function InfoPanel({
       {/* Backdrop */}
       <div
         className="fixed inset-0 z-40 panel-backdrop"
-        onClick={onClose}
+        onPointerUp={closeTap.onPointerUp}
+        onClick={closeTap.onClick}
         style={{
           background: isOpen ? 'rgba(0,0,0,0.62)' : 'rgba(0,0,0,0)',
           transition: liteMode ? undefined : 'background 220ms ease',
@@ -108,7 +112,8 @@ export default function InfoPanel({
             {/* Close button ABOVE title */}
             <div className="flex justify-end">
               <button
-                onClick={onClose}
+                onPointerUp={closeTap.onPointerUp}
+                onClick={closeTap.onClick}
                 className="p-2 rounded-full bg-white/5 hover:bg-white/10"
                 style={{
                   border: `1px solid ${toRgba(color, 0.18)}`,

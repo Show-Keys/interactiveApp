@@ -1928,6 +1928,17 @@
 }
 
 @font-face {
+  font-family: "GE_SS_Two_Medium";
+  src:
+    local("GE SS Two Medium"),
+    local("GE_SS_Two_Medium"),
+    url("./assets/GE_SS_Two_Medium.otf") format("opentype");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
   font-family: "Century Gothic";
   src:
     local("Century Gothic"),
@@ -2142,13 +2153,13 @@ html.no-anim .logo-press {
   top: calc(12px + env(safe-area-inset-top, 0px));
   right: calc(12px + env(safe-area-inset-right, 0px));
   z-index: 4;
-  width: 54px;
-  height: 54px;
+  width: 44px;
+  height: 44px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.20);
   background: rgba(220, 38, 38, 0.85);
   color: rgba(255, 255, 255, 0.95);
-  font-size: 32px;
+  font-size: 26px;
   line-height: 1;
   display: inline-flex;
   align-items: center;
@@ -2343,11 +2354,16 @@ html.no-anim .logo-press {
   font-size: 28px;
   font-weight: 300;
   letter-spacing: 0.04em;
+  font-family: "GE_SS_Two_Medium", var(--font-ar);
+  transition: opacity 220ms ease, transform 220ms ease, filter 220ms ease;
 }
 
 .intro-panel--playing .intro-title {
-  animation: introTitleReveal 38s cubic-bezier(0.2, 0.9, 0.2, 1) 1 both;
-  will-change: transform, opacity, filter;
+  /* Hide the title as soon as the intro video starts. */
+  animation: none;
+  opacity: 0;
+  transform: translateY(-6px);
+  filter: blur(2px);
 }
 
 .intro-sub {
@@ -2378,18 +2394,62 @@ html.no-anim .logo-press {
 
 .intro-start {
   margin-top: 22px;
-  min-height: 80px;
-  padding: 0 44px;
+  min-height: 60px;
+  padding: 0 34px;
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: rgba(255, 255, 255, 0.06);
   color: rgba(255, 255, 255, 0.92);
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 500;
   transition: transform 160ms ease, background 160ms ease;
   align-self: var(--intro-start-align, center);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Saturn-ring accent for the Start button (kiosk-friendly: transform-only). */
+.intro-start::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 170%;
+  height: 70%;
+  transform: translate(-50%, -50%) rotate(-16deg);
+  border-radius: 999px;
+  border: 2px solid rgba(251, 191, 36, 0.38);
+  box-shadow: 0 0 28px rgba(251, 191, 36, 0.18);
+  opacity: 0.95;
+  pointer-events: none;
+}
+
+.intro-start::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 170%;
+  height: 70%;
+  transform: translate(-50%, -50%) rotate(-16deg);
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(251, 191, 36, 0.10),
+    rgba(251, 191, 36, 0.22),
+    rgba(251, 191, 36, 0.10),
+    transparent
+  );
+  opacity: 0.8;
+  pointer-events: none;
+}
+
+.intro-start > * {
+  position: relative;
+  z-index: 1;
 }
 
 .intro-start--ready {
@@ -2428,6 +2488,11 @@ html.no-anim .logo-press {
 
 .intro-start:hover {
   background: rgba(255, 255, 255, 0.10);
+}
+
+.intro-start:hover::before {
+  border-color: rgba(251, 191, 36, 0.52);
+  box-shadow: 0 0 34px rgba(251, 191, 36, 0.24);
 }
 
 .intro-start:active {

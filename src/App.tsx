@@ -657,10 +657,7 @@ export default function App() {
                       <img src={ministryLogo} alt="Ministry Logo" style={{ width: 'var(--intro-logo-width, 520px)' }} />
                     </div>
 
-                    <div dir="rtl" className="intro-title">البرنامج التعريفي التفاعلي</div>
-                    <div className="intro-sub">
-                      {introPhase === 'playing' ? 'Intro playing' : 'Ready'}
-                    </div>
+                    <div dir="rtl" className="intro-title">مجرة القيادة</div>
 
                     {introPhase === 'locked' && (
                       <button
@@ -682,7 +679,7 @@ export default function App() {
                 <div className="kiosk-fixed-ui kiosk-speaker-controls">
                   <button
                     type="button"
-                    className="inline-flex h-[64px] w-[64px] items-center justify-center rounded-full border border-white/12 bg-black/25 text-white/85 backdrop-blur hover:bg-black/35 active:bg-black/45"
+                    className="inline-flex h-[52px] w-[52px] items-center justify-center rounded-full border border-white/12 bg-black/25 text-white/85 backdrop-blur hover:bg-black/35 active:bg-black/45"
                     aria-label="Replay intro"
                     onClick={() => {
                       void sfx.play('tap');
@@ -690,8 +687,8 @@ export default function App() {
                     }}
                   >
                     <svg
-                      width="80"
-                      height="80"
+                      width="20"
+                      height="20"
                       viewBox="0 0 24 24"
                       fill="none"
                       xmlns="http://www.w3.org/2000/svg"
@@ -715,7 +712,7 @@ export default function App() {
 
                   <button
                     type="button"
-                    className="inline-flex h-[64px] w-[64px] items-center justify-center rounded-full border border-white/12 bg-black/25 text-white/85 backdrop-blur hover:bg-black/35 active:bg-black/45"
+                    className="inline-flex h-[52px] w-[52px] items-center justify-center rounded-full border border-white/12 bg-black/25 text-white/85 backdrop-blur hover:bg-black/35 active:bg-black/45"
                     aria-label={musicEnabled ? 'Mute background music' : 'Unmute background music'}
                     onClick={() => {
                       void sfx.play('tap');
@@ -728,8 +725,8 @@ export default function App() {
                   >
                     {musicEnabled ? (
                       <svg
-                        width="80"
-                        height="80"
+                        width="20"
+                        height="20"
                         viewBox="0 0 24 24"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"
@@ -756,8 +753,8 @@ export default function App() {
                       </svg>
                     ) : (
                       <svg
-                        width="80"
-                        height="80"
+                        width="20"
+                        height="20"
                         viewBox="0 0 24 24"
                         fill="none"
                         xmlns="http://www.w3.org/2000/svg"

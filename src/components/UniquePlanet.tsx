@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { useIsMobile } from './ui/use-mobile';
 import { useReducedMotionLike } from './ui/use-reduced-motion';
+import { useFastTap } from '../utils/useFastTap';
 
 interface UniquePlanetProps {
   nameAr: string;
@@ -47,6 +48,8 @@ export default function UniquePlanet({
   const isMobile = useIsMobile();
   const reduceMotion = useReducedMotionLike();
   const liteMode = isMobile || reduceMotion;
+
+  const tap = useFastTap(() => onClick?.());
 
   const x = Math.cos((angle * Math.PI) / 180) * orbitRadius;
   const y = Math.sin((angle * Math.PI) / 180) * orbitRadius;
@@ -377,7 +380,8 @@ export default function UniquePlanet({
       style={{
         transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
       }}
-      onClick={onClick}
+      onPointerUp={tap.onPointerUp}
+      onClick={tap.onClick}
     >
       <div className="orbit-counter" style={{ transformOrigin: 'center' }}>
       {/* Atmospheric glow */}

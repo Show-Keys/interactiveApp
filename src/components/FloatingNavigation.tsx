@@ -1,5 +1,12 @@
+import * as React from 'react';
 import { useIsMobile } from './ui/use-mobile';
 import { useReducedMotionLike } from './ui/use-reduced-motion';
+import { useFastTap } from '../utils/useFastTap';
+
+function FastTapButton({ onActivate, ...props }: React.ComponentProps<'button'> & { onActivate: () => void }) {
+  const tap = useFastTap(onActivate);
+  return <button {...props} onPointerUp={tap.onPointerUp} onClick={tap.onClick} />;
+}
 
 interface Department {
   nameAr: string;
@@ -109,7 +116,7 @@ export default function FloatingNavigation({
             }}
           >
             {/* Minister's Office */}
-            <button
+            <FastTapButton
               className="w-full px-6 py-4 rounded-2xl transition-all relative overflow-hidden active:scale-95"
               style={{
                 background:
@@ -129,7 +136,7 @@ export default function FloatingNavigation({
                 minHeight: '72px',
                 touchAction: 'manipulation',
               }}
-              onClick={() => onSelect(-1)}
+              onActivate={() => onSelect(-1)}
             >
               {selectedIndex === -1 && (
                 <div
@@ -157,7 +164,7 @@ export default function FloatingNavigation({
                   ★
                 </div>
               </div>
-            </button>
+            </FastTapButton>
 
             <div className="flex items-center gap-4 py-3">
               <div className="flex-1 h-[2px] bg-gradient-to-r from-transparent via-white/25 to-transparent" />
@@ -168,7 +175,7 @@ export default function FloatingNavigation({
             </div>
 
             {departments.map((dept, index) => (
-              <button
+              <FastTapButton
                 key={index}
                 className="w-full px-6 py-4 rounded-2xl transition-all relative overflow-hidden text-right active:scale-95"
                 style={{
@@ -183,7 +190,7 @@ export default function FloatingNavigation({
                   minHeight: '70px',
                   touchAction: 'manipulation',
                 }}
-                onClick={() => onSelect(index)}
+                onActivate={() => onSelect(index)}
               >
                 {selectedIndex === index && (
                   <div
@@ -222,7 +229,7 @@ export default function FloatingNavigation({
                     }}
                   />
                 </div>
-              </button>
+              </FastTapButton>
             ))}
           </div>
         </div>

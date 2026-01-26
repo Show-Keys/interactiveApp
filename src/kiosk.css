@@ -1,0 +1,39 @@
+/* Kiosk/touchscreen defaults.
+   Keep this small and additive; it layers on top of Tailwind's preflight in index.css. */
+
+:root {
+  /* Slightly reduce the default touch delay behavior on some browsers. */
+  touch-action: manipulation;
+}
+
+html.kiosk,
+body.kiosk {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+
+  /* Prevent scroll chaining / rubber-band bounce on touch kiosks. */
+  overscroll-behavior: none;
+
+  /* Avoid selection/callouts that feel “sticky” on kiosk touch. */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+
+  /* Remove tap highlight / long-press artifacts. */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Keep form controls usable if you ever add them. */
+input,
+textarea,
+select {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+button,
+[role="button"],
+a {
+  touch-action: manipulation;
+}

@@ -1,5 +1,6 @@
 import { useIsMobile } from './ui/use-mobile';
 import { useReducedMotionLike } from './ui/use-reduced-motion';
+import { useFastTap } from '../utils/useFastTap';
 
 interface MinisterSunProps {
   onClick?: () => void;
@@ -11,8 +12,14 @@ export default function MinisterSun({ onClick, isZoomed }: MinisterSunProps) {
   const reduceMotion = useReducedMotionLike();
   const liteMode = isMobile || reduceMotion;
 
+  const tap = useFastTap(() => onClick?.());
+
   return (
-    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer" onClick={onClick}>
+    <div
+      className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer"
+      onPointerUp={tap.onPointerUp}
+      onClick={tap.onClick}
+    >
       <div className="relative active:scale-95" style={{ transform: `scale(${isZoomed ? 1.5 : 1})` }}>
       {/* Radial golden rays */}
       {!liteMode &&
@@ -24,7 +31,7 @@ export default function MinisterSun({ onClick, isZoomed }: MinisterSunProps) {
               width: '400px',
               height: '2px',
               background: 'linear-gradient(to right, rgba(251, 191, 36, 0.6), rgba(251, 191, 36, 0.1), transparent)',
-              transform: `translate(-50%, -50%) rotate(${i * 30}deg)`,
+              transform: `translateY(-50%) rotate(${i * 30}deg)`,
             }}
           />
         ))}
