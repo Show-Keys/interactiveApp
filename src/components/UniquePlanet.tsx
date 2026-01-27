@@ -380,7 +380,8 @@ export default function UniquePlanet({
       style={{
         transform: `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`,
       }}
-      onPointerUp={tap.onPointerUp}
+      onTouchStart={tap.onTouchStart}
+      onPointerDown={tap.onPointerDown}
       onClick={tap.onClick}
     >
       <div className="orbit-counter" style={{ transformOrigin: 'center' }}>

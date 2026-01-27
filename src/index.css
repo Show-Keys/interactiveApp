@@ -2130,6 +2130,14 @@ html.no-anim .logo-press {
   filter: saturate(110%) contrast(105%) brightness(0.9);
 }
 
+/* Very tall portrait displays ("magic screen"): avoid cropping the poster too aggressively. */
+@media (max-aspect-ratio: 9/16) {
+  .intro-bg-poster {
+    object-fit: contain;
+    background: #000;
+  }
+}
+
 .intro-bg-scrim {
   position: absolute;
   inset: 0;
@@ -2153,13 +2161,13 @@ html.no-anim .logo-press {
   top: calc(12px + env(safe-area-inset-top, 0px));
   right: calc(12px + env(safe-area-inset-right, 0px));
   z-index: 4;
-  width: 44px;
-  height: 44px;
+  width: 56px;
+  height: 56px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.20);
   background: rgba(220, 38, 38, 0.85);
   color: rgba(255, 255, 255, 0.95);
-  font-size: 26px;
+  font-size: 28px;
   line-height: 1;
   display: inline-flex;
   align-items: center;
@@ -2168,11 +2176,8 @@ html.no-anim .logo-press {
   transition: transform 160ms ease, background 160ms ease;
 }
 
-.intro-skip-x:hover {
-  background: rgba(239, 68, 68, 0.92);
-}
-
 .intro-skip-x:active {
+  background: rgba(239, 68, 68, 0.92);
   transform: scale(0.98);
 }
 
@@ -2246,7 +2251,8 @@ html.no-anim .logo-press {
   top: calc(14px + env(safe-area-inset-top, 0px));
   right: calc(14px + env(safe-area-inset-right, 0px));
   z-index: 3;
-  padding: 8px 10px;
+  min-height: 48px;
+  padding: 10px 14px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: rgba(0, 0, 0, 0.22);
@@ -2257,11 +2263,8 @@ html.no-anim .logo-press {
   transition: transform 160ms ease, background 160ms ease;
 }
 
-.intro-skip-corner:hover {
-  background: rgba(0, 0, 0, 0.30);
-}
-
 .intro-skip-corner:active {
+  background: rgba(0, 0, 0, 0.30);
   transform: scale(0.98);
 }
 
@@ -2468,6 +2471,7 @@ html.no-anim .logo-press {
 }
 
 .intro-skip {
+  min-height: 56px;
   padding: 12px 18px;
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.12);
@@ -2485,24 +2489,22 @@ html.no-anim .logo-press {
   text-transform: none;
 }
 
-.intro-skip:hover {
-  background: rgba(0, 0, 0, 0.26);
-}
-
 .intro-skip:active {
+  background: rgba(0, 0, 0, 0.26);
   transform: scale(0.98);
 }
 
 .intro-start:hover {
-  background: rgba(255, 255, 255, 0.10);
+  background: initial;
 }
 
 .intro-start:hover::before {
-  border-color: rgba(251, 191, 36, 0.52);
-  box-shadow: 0 0 34px rgba(251, 191, 36, 0.24);
+  border-color: initial;
+  box-shadow: initial;
 }
 
 .intro-start:active {
+  background: blue;
   transform: scale(0.98);
 }
 

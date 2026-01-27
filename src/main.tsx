@@ -11,6 +11,18 @@ const isCapacitor = typeof (window as any).Capacitor !== "undefined";
 const kioskParam = url.searchParams.get("kiosk");
 const isKiosk = isCapacitor || kioskParam === "1" || kioskParam === "true";
 
+// Touch defaults (apply even when not explicitly in kiosk mode).
+const isTouch =
+	(typeof window.matchMedia === "function" && window.matchMedia("(pointer: coarse)").matches) ||
+	// Fallbacks for older WebViews/browsers.
+	("ontouchstart" in window) ||
+	(typeof navigator !== "undefined" && (navigator.maxTouchPoints ?? 0) > 0);
+
+if (isTouch) {
+	document.documentElement.classList.add("touch");
+	document.body.classList.add("touch");
+}
+
 if (isKiosk) {
 	document.documentElement.classList.add("kiosk");
 	document.body.classList.add("kiosk");

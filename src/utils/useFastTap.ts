@@ -11,11 +11,13 @@ export interface UseFastTapOptions {
 }
 
 /**
- * Makes touchscreen taps feel snappier by activating on pointer-up for touch/pen,
+ * Makes touchscreen taps feel snappier by activating on pointer-down for touch/pen,
  * while suppressing the subsequent synthetic click to prevent double-fires.
  */
 export function useFastTap(onActivate: () => void, options: UseFastTapOptions = {}) {
   const { pointerTypes = ["touch", "pen"], suppressClickMs = 650 } = options;
+
+  const pointerEventsSupported = typeof window !== "undefined" && "PointerEvent" in window;
 
   const activateRef = React.useRef(onActivate);
   React.useEffect(() => {
@@ -45,7 +47,7 @@ export function useFastTap(onActivate: () => void, options: UseFastTapOptions = 
     }, suppressClickMs);
   }, [suppressClickMs]);
 
-  const onPointerUp = React.useCallback(
+  const onPointerDown = React.useCallback(
     (event: React.PointerEvent) => {
       if (!pointerTypes.includes(event.pointerType as FastTapPointerType)) return;
 
@@ -58,6 +60,9 @@ export function useFastTap(onActivate: () => void, options: UseFastTapOptions = 
     [markSuppressClick, pointerTypes]
   );
 
+  // Backwards-compat alias (some components may still wire pointer-up).
+  const onPointerUp = onPointerDown;
+
   const onClick = React.useCallback((event: React.MouseEvent) => {
     if (suppressClickRef.current) {
       event.preventDefault();
@@ -68,5 +73,20 @@ export function useFastTap(onActivate: () => void, options: UseFastTapOptions = 
     activateRef.current();
   }, []);
 
-  return { onPointerUp, onClick };
+  // Touch-first fallback for environments where Pointer Events aren't available.
+  // (Modern browsers will use onPointerUp instead.)
+  const onTouchStart = React.useCallback(
+    (event: React.TouchEvent) => {
+      if (pointerEventsSupported) return;
+
+      // Prevent unwanted text selection/callouts and reduce chance of scroll-gesture interference.
+      event.preventDefault();
+
+      markSuppressClick();
+      activateRef.current();
+    },
+    [markSuppressClick, pointerEventsSupported]
+  );
+
+  return { onPointerDown, onPointerUp, onTouchStart, onClick };
 }

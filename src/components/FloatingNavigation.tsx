@@ -5,7 +5,7 @@ import { useFastTap } from '../utils/useFastTap';
 
 function FastTapButton({ onActivate, ...props }: React.ComponentProps<'button'> & { onActivate: () => void }) {
   const tap = useFastTap(onActivate);
-  return <button {...props} onPointerUp={tap.onPointerUp} onClick={tap.onClick} />;
+  return <button {...props} onTouchStart={tap.onTouchStart} onPointerDown={tap.onPointerDown} onClick={tap.onClick} />;
 }
 
 interface Department {

@@ -9,9 +9,10 @@ import InfoPanel from './components/InfoPanel';
 import { usePrefersReducedMotion, useReducedMotionLike } from './components/ui/use-reduced-motion';
 import { createSfxPlayer } from './utils/sfx';
 import { createLoopingMusicPlayer } from './utils/music';
+import { useFastTap } from './utils/useFastTap';
 import ministryLogo from 'figma:asset/e9f3f4cb580b0827ed78bb6ecbe12efcb70b7930.png';
 import introVideoSrc from './assets/pics and vids/Oman 2040_ The Epic 38s Power Intro.mp4';
-import introPosterSrc from './assets/pics and vids/2040_image.png';
+import introPosterSrc from './assets/pics and vids/galaxcy command.png';
 
 interface DepartmentData {
   nameAr: string;
@@ -579,6 +580,36 @@ export default function App() {
 
   const hideLogoUi = showIntro || selectedPlanet !== null;
 
+  const introStartTap = useFastTap(() => {
+    void sfx.play('tap');
+    beginIntro();
+  });
+
+  const introSkipTap = useFastTap(() => {
+    void sfx.play('tap');
+    startApp();
+  });
+
+  const replayIntroTap = useFastTap(() => {
+    void sfx.play('tap');
+    replayIntro();
+  });
+
+  const toggleMusicTap = useFastTap(() => {
+    void sfx.play('tap');
+    setMusicEnabled((v) => {
+      const next = !v;
+      if (next) void music.ensureStarted();
+      return next;
+    });
+  });
+
+  const toggleNavTap = useFastTap(() => {
+    void sfx.play('tap');
+    if (!showIntro && musicEnabled) void music.ensureStarted();
+    setIsNavOpen((v) => !v);
+  });
+
   return (
     <div
       className="fixed inset-0 overflow-hidden"
@@ -650,10 +681,9 @@ export default function App() {
                         <button
                           type="button"
                           className="intro-start"
-                          onClick={() => {
-                            void sfx.play('tap');
-                            beginIntro();
-                          }}
+                          onTouchStart={introStartTap.onTouchStart}
+                          onPointerDown={introStartTap.onPointerDown}
+                          onClick={introStartTap.onClick}
                         >
                           Start
                         </button>
@@ -664,10 +694,9 @@ export default function App() {
                           type="button"
                           className="intro-skip intro-skip--ar"
                           aria-label="Skip intro"
-                          onClick={() => {
-                            void sfx.play('tap');
-                            startApp();
-                          }}
+                          onTouchStart={introSkipTap.onTouchStart}
+                          onPointerDown={introSkipTap.onPointerDown}
+                          onClick={introSkipTap.onClick}
                         >
                           تخطي
                         </button>
@@ -681,12 +710,11 @@ export default function App() {
                 <div className="kiosk-fixed-ui kiosk-speaker-controls">
                   <button
                     type="button"
-                    className="inline-flex h-[52px] w-[52px] items-center justify-center rounded-full border border-white/12 bg-black/25 text-white/85 backdrop-blur hover:bg-black/35 active:bg-black/45"
+                    className="inline-flex h-[52px] w-[52px] items-center justify-center rounded-full border border-white/12 bg-black/25 text-white/85 backdrop-blur active:bg-black/45"
                     aria-label="Replay intro"
-                    onClick={() => {
-                      void sfx.play('tap');
-                      replayIntro();
-                    }}
+                    onTouchStart={replayIntroTap.onTouchStart}
+                    onPointerDown={replayIntroTap.onPointerDown}
+                    onClick={replayIntroTap.onClick}
                   >
                     <svg
                       width="20"
@@ -714,16 +742,11 @@ export default function App() {
 
                   <button
                     type="button"
-                    className="inline-flex h-[52px] w-[52px] items-center justify-center rounded-full border border-white/12 bg-black/25 text-white/85 backdrop-blur hover:bg-black/35 active:bg-black/45"
+                    className="inline-flex h-[52px] w-[52px] items-center justify-center rounded-full border border-white/12 bg-black/25 text-white/85 backdrop-blur active:bg-black/45"
                     aria-label={musicEnabled ? 'Mute background music' : 'Unmute background music'}
-                    onClick={() => {
-                      void sfx.play('tap');
-                      setMusicEnabled((v) => {
-                        const next = !v;
-                        if (next) void music.ensureStarted();
-                        return next;
-                      });
-                    }}
+                    onTouchStart={toggleMusicTap.onTouchStart}
+                    onPointerDown={toggleMusicTap.onPointerDown}
+                    onClick={toggleMusicTap.onClick}
                   >
                     {musicEnabled ? (
                       <svg
@@ -793,11 +816,9 @@ export default function App() {
                       className={`bg-transparent border-0 p-0 cursor-pointer logo-press transition-opacity duration-200 ${
                         isNavOpen ? 'opacity-50' : 'opacity-100'
                       }`}
-                      onClick={() => {
-                        void sfx.play('tap');
-                        if (!showIntro && musicEnabled) void music.ensureStarted();
-                        setIsNavOpen((v) => !v);
-                      }}
+                      onTouchStart={toggleNavTap.onTouchStart}
+                      onPointerDown={toggleNavTap.onPointerDown}
+                      onClick={toggleNavTap.onClick}
                       aria-label="Toggle navigation"
                       type="button"
                     >

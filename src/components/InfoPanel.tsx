@@ -60,7 +60,8 @@ export default function InfoPanel({
       {/* Backdrop */}
       <div
         className="fixed inset-0 z-40 panel-backdrop"
-        onPointerUp={closeTap.onPointerUp}
+        onTouchStart={closeTap.onTouchStart}
+        onPointerDown={closeTap.onPointerDown}
         onClick={closeTap.onClick}
         style={{
           background: isOpen ? 'rgba(0,0,0,0.62)' : 'rgba(0,0,0,0)',
@@ -112,9 +113,10 @@ export default function InfoPanel({
             {/* Close button ABOVE title */}
             <div className="flex justify-end">
               <button
-                onPointerUp={closeTap.onPointerUp}
+                onTouchStart={closeTap.onTouchStart}
+                onPointerDown={closeTap.onPointerDown}
                 onClick={closeTap.onClick}
-                className="p-2 rounded-full bg-white/5 hover:bg-white/10"
+                className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-white/5 active:bg-white/10"
                 style={{
                   border: `1px solid ${toRgba(color, 0.18)}`,
                   boxShadow: `0 10px 22px rgba(0,0,0,0.35)`,

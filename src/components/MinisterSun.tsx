@@ -17,7 +17,8 @@ export default function MinisterSun({ onClick, isZoomed }: MinisterSunProps) {
   return (
     <div
       className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-pointer"
-      onPointerUp={tap.onPointerUp}
+      onTouchStart={tap.onTouchStart}
+      onPointerDown={tap.onPointerDown}
       onClick={tap.onClick}
     >
       <div className="relative active:scale-95" style={{ transform: `scale(${isZoomed ? 1.5 : 1})` }}>
