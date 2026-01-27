@@ -9,15 +9,10 @@ export function createLoopingMusicPlayer(options: MusicPlayerOptions) {
   let enabled = options.enabled ?? true;
   let startedOnce = false;
 
-  const createAudio = () => {
-    const element = new Audio(options.src);
-    element.preload = 'auto';
-    element.loop = true;
-    element.volume = volume;
-    return element;
-  };
-
-  let audio = createAudio();
+  const audio = new Audio(options.src);
+  audio.preload = 'auto';
+  audio.loop = true;
+  audio.volume = volume;
 
   const start = async () => {
     if (!enabled) return;
@@ -68,37 +63,5 @@ export function createLoopingMusicPlayer(options: MusicPlayerOptions) {
     audio.volume = clamped;
   };
 
-  const preload = () => {
-    try {
-      audio.load();
-    } catch {
-      // ignore
-    }
-  };
-
-  const unlock = async () => {
-    try {
-      const previousVolume = audio.volume;
-      audio.volume = 0;
-      await audio.play();
-      audio.pause();
-      audio.currentTime = 0;
-      audio.volume = previousVolume;
-    } catch {
-      // Autoplay policy or WebView limitations.
-    }
-  };
-
-  const reinitialize = () => {
-    try {
-      audio.pause();
-    } catch {
-      // ignore
-    }
-    startedOnce = false;
-    audio = createAudio();
-    preload();
-  };
-
-  return { start, ensureStarted, pause, stop, setEnabled, getEnabled, setVolume, preload, unlock, reinitialize };
+  return { start, ensureStarted, pause, stop, setEnabled, getEnabled, setVolume };
 }
