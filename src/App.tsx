@@ -406,7 +406,31 @@ export default function App() {
 
   useEffect(() => {
     sfx.preload();
-  }, [sfx]);
+    music.preload();
+  }, [music, sfx]);
+
+  useEffect(() => {
+    let unlocked = false;
+
+    const unlockAudio = () => {
+      if (unlocked) return;
+      unlocked = true;
+      void sfx.unlock();
+      void music.unlock();
+
+      if (!showIntro && musicEnabled) void music.ensureStarted();
+    };
+
+    window.addEventListener('pointerdown', unlockAudio, { passive: true, once: true });
+    window.addEventListener('touchstart', unlockAudio, { passive: true, once: true });
+    window.addEventListener('keydown', unlockAudio, { passive: true, once: true });
+
+    return () => {
+      window.removeEventListener('pointerdown', unlockAudio);
+      window.removeEventListener('touchstart', unlockAudio);
+      window.removeEventListener('keydown', unlockAudio);
+    };
+  }, [music, musicEnabled, sfx, showIntro]);
 
   useEffect(() => {
     const appStarted = !showIntro;
@@ -422,6 +446,25 @@ export default function App() {
     // on user taps when music is enabled.
     if (appStarted && musicEnabled) void music.ensureStarted();
   }, [music, musicEnabled, showIntro]);
+
+  useEffect(() => {
+    const handleForeground = () => {
+      if (document.visibilityState !== 'visible') return;
+
+      sfx.reinitialize();
+      music.reinitialize();
+
+      if (!showIntro && musicEnabled) void music.ensureStarted();
+    };
+
+    document.addEventListener('visibilitychange', handleForeground);
+    window.addEventListener('focus', handleForeground);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleForeground);
+      window.removeEventListener('focus', handleForeground);
+    };
+  }, [music, musicEnabled, sfx, showIntro]);
 
   useEffect(() => {
     if (!showIntro) return;

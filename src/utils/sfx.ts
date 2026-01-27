@@ -42,9 +42,26 @@ export function createSfxPlayer(options: SfxPlayerOptions = {}) {
   const preload = (names: SfxName[] = ['tap', 'open', 'close', 'select']) => {
     for (const name of names) {
       try {
-        void getAudio(name);
+        const audio = getAudio(name);
+        audio.load();
       } catch {
         // ignore
+      }
+    }
+  };
+
+  const unlock = async (names: SfxName[] = ['tap']) => {
+    for (const name of names) {
+      try {
+        const audio = getAudio(name);
+        const previousVolume = audio.volume;
+        audio.volume = 0;
+        await audio.play();
+        audio.pause();
+        audio.currentTime = 0;
+        audio.volume = previousVolume;
+      } catch {
+        // Autoplay policy or WebView limitations.
       }
     }
   };
@@ -73,5 +90,10 @@ export function createSfxPlayer(options: SfxPlayerOptions = {}) {
 
   const getEnabled = () => enabled;
 
-  return { play, preload, setEnabled, getEnabled };
+  const reinitialize = (names: SfxName[] = ['tap', 'open', 'close', 'select']) => {
+    cache.clear();
+    preload(names);
+  };
+
+  return { play, preload, unlock, reinitialize, setEnabled, getEnabled };
 }
