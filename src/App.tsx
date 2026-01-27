@@ -983,7 +983,6 @@ export default function App() {
         </div>
         </div>
       </div>
-//upper part of the screen proptinate with the magic screen 
       {/* Info panel */}
       {selectedPlanet !== null && (
         <InfoPanel
